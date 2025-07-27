@@ -15,8 +15,8 @@
     <groupId>com.opsportal</groupId>
     <artifactId>ops-portal</artifactId>
     <version>1.0.0</version>
-    <name>Operations Portal</name>
-    <description>Operations Portal with Health Checks, Infrastructure Reports, and Command Execution</description>
+    <name>Ops Portal</name>
+    <description>Ops Portal with Health Checks, Infrastructure Reports, and Command Execution</description>
 
     <properties>
         <java.version>17</java.version>

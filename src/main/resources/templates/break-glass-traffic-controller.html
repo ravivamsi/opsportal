@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' - Ops Portal'">Ops Portal</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            margin: 0.25rem 0;
+        }
+        .sidebar .nav-link:hover {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .sidebar .nav-section {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 1rem 1rem 0.5rem 1rem;
+            margin-top: 1rem;
+        }
+        .sidebar .nav-subitem {
+            padding-left: 2rem;
+            font-size: 0.9rem;
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .traffic-status {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .traffic-active {
+            color: #28a745;
+        }
+        .traffic-inactive {
+            color: #dc3545;
+        }
+        .traffic-warning {
+            color: #ffc107;
+        }
+        .cluster-card {
+            transition: all 0.3s ease;
+        }
+        .cluster-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        .traffic-flow {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Ops Portal</h4>
+                    </div>
+                    <ul class="nav flex-column">
+                        <!-- Dashboard Section -->
+                        <li class="nav-section">Dashboard</li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/market-open}">
+                                <i class="fas fa-chart-line me-2"></i>
+                                Market Open
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/system-health}">
+                                <i class="fas fa-heartbeat me-2"></i>
+                                System Health
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/inventory}">
+                                <i class="fas fa-boxes me-2"></i>
+                                Inventory
+                            </a>
+                        </li>
+
+                        <!-- Dry Run Section -->
+                        <li class="nav-section">Dry Run</li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dry-run/report}">
+                                <i class="fas fa-file-alt me-2"></i>
+                                Report
+                            </a>
+                        </li>
+
+                        <!-- Break Glass Section -->
+                        <li class="nav-section">Break Glass</li>
+                        <li class="nav-item">
+                            <a class="nav-link active" th:href="@{/break-glass/traffic-controller}">
+                                <i class="fas fa-traffic-light me-2"></i>
+                                Traffic Controller
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/break-glass/dr-ops}">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                DR Ops
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/break-glass/emergency-ops}">
+                                <i class="fas fa-ambulance me-2"></i>
+                                Emergency Ops
+                            </a>
+                        </li>
+
+                        <!-- DoD Section -->
+                        <li class="nav-section">DoD</li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/config-review}">
+                                <i class="fas fa-code-branch me-2"></i>
+                                Config Review
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/kafka}">
+                                <i class="fas fa-stream me-2"></i>
+                                Kafka
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/certificate}">
+                                <i class="fas fa-certificate me-2"></i>
+                                Certificate
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/service-accounts}">
+                                <i class="fas fa-users me-2"></i>
+                                Service Accounts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/firewall}">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                Firewall
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2" th:text="${title}">Dashboard</h1>
+                </div>
+                
+                <!-- Page content -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="alert alert-warning">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Break Glass - Traffic Controller
+                            </h6>
+                            <p>This section allows you to divert traffic among clusters. Use with caution as this affects live traffic.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Traffic Status -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-chart-line"></i>
+                                    Current Traffic Status
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <div class="traffic-status traffic-active">
+                                                <i class="fas fa-circle"></i> Active
+                                            </div>
+                                            <p class="mb-0">Primary Cluster</p>
+                                            <small class="text-muted">Cluster-1 (80% traffic)</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <div class="traffic-status traffic-warning">
+                                                <i class="fas fa-circle"></i> Standby
+                                            </div>
+                                            <p class="mb-0">Secondary Cluster</p>
+                                            <small class="text-muted">Cluster-2 (20% traffic)</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <div class="traffic-status traffic-inactive">
+                                                <i class="fas fa-circle"></i> Inactive
+                                            </div>
+                                            <p class="mb-0">DR Cluster</p>
+                                            <small class="text-muted">Cluster-DR (0% traffic)</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <div class="traffic-status traffic-inactive">
+                                                <i class="fas fa-circle"></i> Inactive
+                                            </div>
+                                            <p class="mb-0">Test Cluster</p>
+                                            <small class="text-muted">Cluster-Test (0% traffic)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Traffic Control Options -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-exchange-alt"></i>
+                                    Traffic Diversion
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <form id="trafficForm">
+                                    <div class="mb-3">
+                                        <label for="sourceCluster" class="form-label">Source Cluster</label>
+                                        <select class="form-select" id="sourceCluster" required>
+                                            <option value="">Select Source Cluster</option>
+                                            <option value="cluster1">Cluster-1 (Primary)</option>
+                                            <option value="cluster2">Cluster-2 (Secondary)</option>
+                                            <option value="cluster-dr">Cluster-DR</option>
+                                            <option value="cluster-test">Cluster-Test</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="targetCluster" class="form-label">Target Cluster</label>
+                                        <select class="form-select" id="targetCluster" required>
+                                            <option value="">Select Target Cluster</option>
+                                            <option value="cluster1">Cluster-1 (Primary)</option>
+                                            <option value="cluster2">Cluster-2 (Secondary)</option>
+                                            <option value="cluster-dr">Cluster-DR</option>
+                                            <option value="cluster-test">Cluster-Test</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="trafficPercentage" class="form-label">Traffic Percentage</label>
+                                        <input type="range" class="form-range" id="trafficPercentage" min="0" max="100" value="50">
+                                        <div class="d-flex justify-content-between">
+                                            <small>0%</small>
+                                            <small id="percentageValue">50%</small>
+                                            <small>100%</small>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="reason" class="form-label">Reason for Traffic Change</label>
+                                        <textarea class="form-control" id="reason" rows="3" placeholder="Enter reason for traffic diversion..." required></textarea>
+                                    </div>
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-warning">
+                                            <i class="fas fa-exchange-alt"></i>
+                                            Divert Traffic
+                                        </button>
+                                        <button type="button" class="btn btn-danger" onclick="emergencyFailover()">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            Emergency Failover
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-history"></i>
+                                    Recent Traffic Changes
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group list-group-flush" id="trafficHistory">
+                                    <div class="list-group-item">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">Traffic diverted to Cluster-2</h6>
+                                            <small class="text-muted">2 hours ago</small>
+                                        </div>
+                                        <p class="mb-1">20% traffic moved from Cluster-1 to Cluster-2</p>
+                                        <small class="text-muted">Reason: Load balancing</small>
+                                    </div>
+                                    <div class="list-group-item">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">Emergency failover to DR</h6>
+                                            <small class="text-muted">1 day ago</small>
+                                        </div>
+                                        <p class="mb-1">100% traffic moved to Cluster-DR</p>
+                                        <small class="text-muted">Reason: Primary cluster maintenance</small>
+                                    </div>
+                                    <div class="list-group-item">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">Traffic restored to primary</h6>
+                                            <small class="text-muted">1 day ago</small>
+                                        </div>
+                                        <p class="mb-1">100% traffic restored to Cluster-1</p>
+                                        <small class="text-muted">Reason: Maintenance completed</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cluster Status -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-server"></i>
+                                    Cluster Status
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card cluster-card border-success">
+                                            <div class="card-body text-center">
+                                                <h5 class="card-title">Cluster-1</h5>
+                                                <div class="traffic-status traffic-active mb-2">Active</div>
+                                                <p class="card-text">Primary cluster handling 80% of traffic</p>
+                                                <small class="text-muted">Health: 100% | Load: 75%</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card cluster-card border-warning">
+                                            <div class="card-body text-center">
+                                                <h5 class="card-title">Cluster-2</h5>
+                                                <div class="traffic-status traffic-warning mb-2">Standby</div>
+                                                <p class="card-text">Secondary cluster handling 20% of traffic</p>
+                                                <small class="text-muted">Health: 95% | Load: 45%</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card cluster-card border-secondary">
+                                            <div class="card-body text-center">
+                                                <h5 class="card-title">Cluster-DR</h5>
+                                                <div class="traffic-status traffic-inactive mb-2">Inactive</div>
+                                                <p class="card-text">Disaster recovery cluster ready</p>
+                                                <small class="text-muted">Health: 100% | Load: 0%</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card cluster-card border-info">
+                                            <div class="card-body text-center">
+                                                <h5 class="card-title">Cluster-Test</h5>
+                                                <div class="traffic-status traffic-inactive mb-2">Inactive</div>
+                                                <p class="card-text">Testing cluster for validation</p>
+                                                <small class="text-muted">Health: 90% | Load: 0%</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Custom JS -->
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            // Initialize traffic controller page
+            console.log('Traffic controller page loaded');
+            
+            // Update percentage display
+            $('#trafficPercentage').on('input', function() {
+                $('#percentageValue').text($(this).val() + '%');
+            });
+        });
+
+        $('#trafficForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const sourceCluster = $('#sourceCluster').val();
+            const targetCluster = $('#targetCluster').val();
+            const percentage = $('#trafficPercentage').val();
+            const reason = $('#reason').val();
+            
+            if (!sourceCluster || !targetCluster || !reason) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            if (sourceCluster === targetCluster) {
+                alert('Source and target clusters must be different');
+                return;
+            }
+            
+            // Show confirmation dialog
+            if (confirm(`Are you sure you want to divert ${percentage}% traffic from ${sourceCluster} to ${targetCluster}?\n\nReason: ${reason}`)) {
+                divertTraffic(sourceCluster, targetCluster, percentage, reason);
+            }
+        });
+
+        function divertTraffic(sourceCluster, targetCluster, percentage, reason) {
+            // Simulate API call
+            $('#trafficForm button[type="submit"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Diverting...');
+            
+            setTimeout(() => {
+                // Add to history
+                const historyItem = `
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Traffic diverted to ${targetCluster}</h6>
+                            <small class="text-muted">Just now</small>
+                        </div>
+                        <p class="mb-1">${percentage}% traffic moved from ${sourceCluster} to ${targetCluster}</p>
+                        <small class="text-muted">Reason: ${reason}</small>
+                    </div>
+                `;
+                $('#trafficHistory').prepend(historyItem);
+                
+                // Reset form
+                $('#trafficForm')[0].reset();
+                $('#percentageValue').text('50%');
+                $('#trafficForm button[type="submit"]').prop('disabled', false).html('<i class="fas fa-exchange-alt"></i> Divert Traffic');
+                
+                // Show success message
+                alert('Traffic diversion completed successfully!');
+            }, 2000);
+        }
+
+        function emergencyFailover() {
+            if (confirm('Are you sure you want to perform an emergency failover? This will divert 100% traffic to the DR cluster.')) {
+                // Simulate emergency failover
+                alert('Emergency failover initiated. All traffic is being diverted to DR cluster.');
+                
+                // Add to history
+                const historyItem = `
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Emergency failover to DR</h6>
+                            <small class="text-muted">Just now</small>
+                        </div>
+                        <p class="mb-1">100% traffic moved to Cluster-DR</p>
+                        <small class="text-muted">Reason: Emergency failover</small>
+                    </div>
+                `;
+                $('#trafficHistory').prepend(historyItem);
+            }
+        }
+    </script>
+</body>
+</html> 

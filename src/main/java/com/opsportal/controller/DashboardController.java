@@ -51,6 +51,25 @@ public class DashboardController {
         return "dry-run-windows";
     }
 
+    // Break Glass Section
+    @GetMapping("/break-glass/traffic-controller")
+    public String breakGlassTrafficController(Model model) {
+        model.addAttribute("title", "Break Glass - Traffic Controller");
+        return "break-glass-traffic-controller";
+    }
+
+    @GetMapping("/break-glass/dr-ops")
+    public String breakGlassDrOps(Model model) {
+        model.addAttribute("title", "Break Glass - DR Ops");
+        return "break-glass-dr-ops";
+    }
+
+    @GetMapping("/break-glass/emergency-ops")
+    public String breakGlassEmergencyOps(Model model) {
+        model.addAttribute("title", "Break Glass - Emergency Ops");
+        return "break-glass-emergency-ops";
+    }
+
     // DoD Section
     @GetMapping("/dod/config-review")
     public String dodConfigReview(Model model) {

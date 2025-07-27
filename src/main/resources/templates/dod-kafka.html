@@ -66,14 +66,14 @@
             max-height: 400px;
             overflow-y: auto;
         }
-        .expiring-soon {
-            color: #ffc107;
+        .permission-read {
+            color: #17a2b8;
         }
-        .expired {
-            color: #dc3545;
-        }
-        .valid {
+        .permission-write {
             color: #28a745;
+        }
+        .permission-both {
+            color: #6f42c1;
         }
     </style>
 </head>
@@ -138,7 +138,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" th:href="@{/dod/kafka}">
+                            <a class="nav-link active" th:href="@{/dod/kafka}">
                                 <i class="fas fa-stream me-2"></i>
                                 Kafka
                             </a>
@@ -150,7 +150,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" th:href="@{/dod/service-accounts}">
+                            <a class="nav-link" th:href="@{/dod/service-accounts}">
                                 <i class="fas fa-users me-2"></i>
                                 Service Accounts
                             </a>
@@ -176,52 +176,45 @@
                     <div class="col-12">
                         <div class="card shadow mb-4">
                             <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Service Account Management</h6>
+                                <h6 class="m-0 font-weight-bold text-primary">DoD - Kafka Topic Management</h6>
                             </div>
                             <div class="card-body">
                                 <!-- Filter Controls -->
                                 <div class="row mb-3">
                                     <div class="col-md-4">
-                                        <label for="appnameFilter" class="form-label">Application</label>
-                                        <select class="form-select" id="appnameFilter">
-                                            <option value="">All</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="sanameFilter" class="form-label">Service Account Name</label>
-                                        <select class="form-select" id="sanameFilter">
-                                            <option value="">All</option>
+                                        <label for="topicFilter" class="form-label">Filter by Topic Name</label>
+                                        <select class="form-select" id="topicFilter">
+                                            <option value="">All Topics</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4 d-flex align-items-end">
-                                        <button class="btn btn-primary me-2" onclick="searchServiceAccounts()">
-                                            <i class="fas fa-search"></i> Search
+                                        <button class="btn btn-secondary me-2" onclick="clearFilter()">
+                                            <i class="fas fa-times"></i> Clear Filter
                                         </button>
-                                        <button class="btn btn-secondary" onclick="clearFilters()">
-                                            <i class="fas fa-times"></i> Clear Filters
+                                        <button class="btn btn-primary" onclick="refreshData()">
+                                            <i class="fas fa-sync-alt"></i> Refresh
                                         </button>
                                     </div>
                                 </div>
 
-                                <!-- Service Account Table -->
+                                <!-- Kafka Topics Table -->
                                 <div class="table-responsive">
-                                    <table class="table table-striped table-hover" id="serviceAccountTable">
+                                    <table class="table table-striped table-hover" id="kafkaTable">
                                         <thead class="table-dark">
                                             <tr>
-                                                <th>Application</th>
-                                                <th>Service Account Name</th>
-                                                <th>Expiry Date</th>
-                                                <th>Last Rotation</th>
-                                                <th>Status</th>
+                                                <th>App Name</th>
+                                                <th>Topic Name</th>
+                                                <th>Cert/SA Name</th>
+                                                <th>Permissions</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="serviceAccountTableBody">
+                                        <tbody id="kafkaTableBody">
                                             <tr>
-                                                <td colspan="5" class="text-center">
+                                                <td colspan="4" class="text-center">
                                                     <div class="spinner-border text-primary" role="status">
                                                         <span class="visually-hidden">Loading...</span>
                                                     </div>
-                                                    <p class="mt-2">Loading service account data...</p>
+                                                    <p class="mt-2">Loading Kafka data...</p>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -236,12 +229,12 @@
                                                 <div class="row no-gutters align-items-center">
                                                     <div class="col mr-2">
                                                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                            Total Service Accounts
+                                                            Total Records
                                                         </div>
-                                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalServiceAccounts">0</div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalRecords">0</div>
                                                     </div>
                                                     <div class="col-auto">
-                                                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                                                        <i class="fas fa-list fa-2x text-gray-300"></i>
                                                     </div>
                                                 </div>
                                             </div>
@@ -253,12 +246,29 @@
                                                 <div class="row no-gutters align-items-center">
                                                     <div class="col mr-2">
                                                         <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                            Valid Service Accounts
+                                                            Applications
                                                         </div>
-                                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="validServiceAccounts">0</div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalApplications">0</div>
                                                     </div>
                                                     <div class="col-auto">
-                                                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                                        <i class="fas fa-cube fa-2x text-gray-300"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card border-left-info shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="row no-gutters align-items-center">
+                                                    <div class="col mr-2">
+                                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                            Topics
+                                                        </div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalTopics">0</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-stream fa-2x text-gray-300"></i>
                                                     </div>
                                                 </div>
                                             </div>
@@ -270,29 +280,12 @@
                                                 <div class="row no-gutters align-items-center">
                                                     <div class="col mr-2">
                                                         <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                                            Expiring Soon
+                                                            Certificates/SAs
                                                         </div>
-                                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="expiringSoonServiceAccounts">0</div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalCertSAs">0</div>
                                                     </div>
                                                     <div class="col-auto">
-                                                        <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="card border-left-danger shadow h-100 py-2">
-                                            <div class="card-body">
-                                                <div class="row no-gutters align-items-center">
-                                                    <div class="col mr-2">
-                                                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                                            Expired Service Accounts
-                                                        </div>
-                                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="expiredServiceAccounts">0</div>
-                                                    </div>
-                                                    <div class="col-auto">
-                                                        <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                                                        <i class="fas fa-certificate fa-2x text-gray-300"></i>
                                                     </div>
                                                 </div>
                                             </div>
@@ -313,157 +306,120 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Custom JS -->
     <script th:inline="javascript">
-        let serviceAccountData = [];
+        let kafkaData = [];
         let filteredData = [];
 
         $(document).ready(function() {
-            loadServiceAccountData();
+            loadKafkaData();
         });
 
-        function loadServiceAccountData() {
-            $.get('/api/service-accounts/data', function(data) {
-                serviceAccountData = data;
+        function loadKafkaData() {
+            $.get('/api/kafka/data', function(data) {
+                kafkaData = data;
                 filteredData = data;
                 
-                // Populate filter dropdowns
-                populateFilters();
+                // Populate filter dropdown
+                populateTopicFilter();
                 
                 // Display data
-                displayServiceAccountData();
+                displayKafkaData();
                 
                 // Update summary stats
                 updateSummaryStats();
             }).fail(function(xhr, status, error) {
-                $('#serviceAccountTableBody').html(`
+                $('#kafkaTableBody').html(`
                     <tr>
-                        <td colspan="5" class="text-center text-danger">
+                        <td colspan="4" class="text-center text-danger">
                             <i class="fas fa-exclamation-triangle"></i>
-                            Failed to load service account data: ${error}
+                            Failed to load Kafka data: ${error}
                         </td>
                     </tr>
                 `);
             });
         }
 
-        function populateFilters() {
-            // Application filter
-            const appNames = [...new Set(serviceAccountData.map(item => item.appname))];
-            let appOptions = '<option value="">All</option>';
-            appNames.forEach(app => {
-                appOptions += `<option value="${app}">${app}</option>`;
+        function populateTopicFilter() {
+            const topics = [...new Set(kafkaData.map(item => item.topicName))];
+            let options = '<option value="">All Topics</option>';
+            topics.forEach(topic => {
+                options += `<option value="${topic}">${topic}</option>`;
             });
-            $('#appnameFilter').html(appOptions);
-
-            // Service Account name filter
-            const saNames = [...new Set(serviceAccountData.map(item => item.saname))];
-            let saOptions = '<option value="">All</option>';
-            saNames.forEach(sa => {
-                saOptions += `<option value="${sa}">${sa}</option>`;
-            });
-            $('#sanameFilter').html(saOptions);
+            $('#topicFilter').html(options);
         }
 
-        function displayServiceAccountData() {
+        function displayKafkaData() {
             let tableHtml = '';
             
             if (filteredData.length === 0) {
                 tableHtml = `
                     <tr>
-                        <td colspan="5" class="text-center text-muted">
-                            No data found matching the selected filters
+                        <td colspan="4" class="text-center text-muted">
+                            No data found matching the selected filter
                         </td>
                     </tr>
                 `;
             } else {
                 filteredData.forEach(item => {
-                    const expiryDate = new Date(item.saexpirydate);
-                    const today = new Date();
-                    const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-                    
-                    let statusClass = 'valid';
-                    let statusIcon = 'fa-check-circle';
-                    let statusText = 'Valid';
-                    
-                    if (daysUntilExpiry < 0) {
-                        statusClass = 'expired';
-                        statusIcon = 'fa-times-circle';
-                        statusText = 'Expired';
-                    } else if (daysUntilExpiry <= 30) {
-                        statusClass = 'expiring-soon';
-                        statusIcon = 'fa-exclamation-triangle';
-                        statusText = 'Expiring Soon';
+                    let permissionClass = 'permission-read';
+                    if (item.permissions.includes('WRITE') && item.permissions.includes('READ')) {
+                        permissionClass = 'permission-both';
+                    } else if (item.permissions.includes('WRITE')) {
+                        permissionClass = 'permission-write';
                     }
                     
                     tableHtml += `
                         <tr>
-                            <td>${item.appname}</td>
-                            <td>${item.saname}</td>
-                            <td>${item.saexpirydate}</td>
-                            <td>${item.lastrotation}</td>
-                            <td>
-                                <i class="fas ${statusIcon} ${statusClass}"></i>
-                                ${statusText}
-                            </td>
+                            <td><strong>${item.appName}</strong></td>
+                            <td><code>${item.topicName}</code></td>
+                            <td>${item.certSaName}</td>
+                            <td><span class="${permissionClass}">${item.permissions}</span></td>
                         </tr>
                     `;
                 });
             }
             
-            $('#serviceAccountTableBody').html(tableHtml);
+            $('#kafkaTableBody').html(tableHtml);
         }
 
         function updateSummaryStats() {
             const total = filteredData.length;
-            let valid = 0;
-            let expiringSoon = 0;
-            let expired = 0;
+            const applications = [...new Set(filteredData.map(item => item.appName))].length;
+            const topics = [...new Set(filteredData.map(item => item.topicName))].length;
+            const certSAs = [...new Set(filteredData.map(item => item.certSaName))].length;
 
-            filteredData.forEach(item => {
-                const expiryDate = new Date(item.saexpirydate);
-                const today = new Date();
-                const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-                
-                if (daysUntilExpiry < 0) {
-                    expired++;
-                } else if (daysUntilExpiry <= 30) {
-                    expiringSoon++;
-                } else {
-                    valid++;
-                }
-            });
-
-            $('#totalServiceAccounts').text(total);
-            $('#validServiceAccounts').text(valid);
-            $('#expiringSoonServiceAccounts').text(expiringSoon);
-            $('#expiredServiceAccounts').text(expired);
+            $('#totalRecords').text(total);
+            $('#totalApplications').text(applications);
+            $('#totalTopics').text(topics);
+            $('#totalCertSAs').text(certSAs);
         }
 
-        function searchServiceAccounts() {
-            const appnameFilter = $('#appnameFilter').val();
-            const sanameFilter = $('#sanameFilter').val();
-
-            filteredData = serviceAccountData.filter(item => {
-                const appMatch = !appnameFilter || item.appname === appnameFilter;
-                const saMatch = !sanameFilter || item.saname === sanameFilter;
-                return appMatch && saMatch;
-            });
-
-            displayServiceAccountData();
+        function filterByTopic() {
+            const selectedTopic = $('#topicFilter').val();
+            
+            if (!selectedTopic) {
+                filteredData = kafkaData;
+            } else {
+                filteredData = kafkaData.filter(item => item.topicName === selectedTopic);
+            }
+            
+            displayKafkaData();
             updateSummaryStats();
         }
 
-        function clearFilters() {
-            $('#appnameFilter').val('');
-            $('#sanameFilter').val('');
-
-            filteredData = serviceAccountData;
-            displayServiceAccountData();
+        function clearFilter() {
+            $('#topicFilter').val('');
+            filteredData = kafkaData;
+            displayKafkaData();
             updateSummaryStats();
         }
 
-        // Auto-search on filter change
-        $('select[id$="Filter"]').on('change', function() {
-            searchServiceAccounts();
+        function refreshData() {
+            loadKafkaData();
+        }
+
+        // Auto-filter on topic selection change
+        $('#topicFilter').on('change', function() {
+            filterByTopic();
         });
     </script>
 </body>

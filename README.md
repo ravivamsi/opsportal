@@ -1,4 +1,4 @@
-# Operations Portal
+# Ops Portal
 
 A comprehensive Spring Boot application with Thymeleaf UI for operations management, featuring health checks, infrastructure monitoring, command execution, and configuration management.
 

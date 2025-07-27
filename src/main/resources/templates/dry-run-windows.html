@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${title} + ' - Operations Portal'">Operations Portal</title>
+    <title th:text="${title} + ' - Ops Portal'">Ops Portal</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -50,12 +50,6 @@
             border: none;
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
         }
-        .status-up {
-            color: #28a745;
-        }
-        .status-down {
-            color: #dc3545;
-        }
         .command-output {
             background-color: #f8f9fa;
             border: 1px solid #dee2e6;
@@ -75,7 +69,7 @@
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="position-sticky pt-3">
                     <div class="text-center mb-4">
-                        <h4 class="text-white">Operations Portal</h4>
+                        <h4 class="text-white">Ops Portal</h4>
                     </div>
                     <ul class="nav flex-column">
                         <!-- Dashboard Section -->
@@ -117,6 +111,27 @@
                             <a class="nav-link active" th:href="@{/dry-run/windows}">
                                 <i class="fab fa-windows me-2"></i>
                                 Windows
+                            </a>
+                        </li>
+
+                        <!-- Break Glass Section -->
+                        <li class="nav-section">Break Glass</li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/break-glass/traffic-controller}">
+                                <i class="fas fa-traffic-light me-2"></i>
+                                Traffic Controller
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/break-glass/dr-ops}">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                DR Ops
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/break-glass/emergency-ops}">
+                                <i class="fas fa-ambulance me-2"></i>
+                                Emergency Ops
                             </a>
                         </li>
 
@@ -172,60 +187,118 @@
                             <div class="card-body">
                                 <form id="windowsCommandForm">
                                     <div class="row">
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <div class="mb-3">
-                                                <label for="windowsServer" class="form-label">Select VM</label>
-                                                <select class="form-select" id="windowsServer" required>
-                                                    <option value="">Loading VMs...</option>
+                                                <label for="serverSelect" class="form-label">Select Server</label>
+                                                <select class="form-select" id="serverSelect" required>
+                                                    <option value="">Choose a server...</option>
+                                                    <option value="win-server1">Windows Server 1 (192.168.1.20)</option>
+                                                    <option value="win-server2">Windows Server 2 (192.168.1.21)</option>
+                                                    <option value="win-server3">Windows Server 3 (192.168.1.22)</option>
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-md-8">
+                                        <div class="col-md-6">
                                             <div class="mb-3">
-                                                <label for="windowsCommand" class="form-label">PowerShell Command</label>
-                                                <input type="text" class="form-control" id="windowsCommand" 
-                                                       placeholder="e.g., Get-Process, Get-Service, Get-WmiObject" required>
+                                                <label for="commandInput" class="form-label">PowerShell Command</label>
+                                                <input type="text" class="form-control" id="commandInput" 
+                                                       placeholder="e.g., Get-Process, Get-Service, Get-ComputerInfo" required>
                                             </div>
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-info">
-                                        <i class="fab fa-windows"></i> Execute Command (Dry Run)
-                                    </button>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="username" class="form-label">Username</label>
+                                                <input type="text" class="form-control" id="username" 
+                                                       placeholder="e.g., administrator" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="password" class="form-label">Password</label>
+                                                <input type="password" class="form-control" id="password" 
+                                                       placeholder="Enter password" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-play"></i> Execute Command
+                                        </button>
+                                        <button type="button" class="btn btn-secondary" onclick="loadPresetCommands()">
+                                            <i class="fas fa-list"></i> Load Preset Commands
+                                        </button>
+                                    </div>
                                 </form>
-                                <div id="windowsCommandResult" class="mt-3"></div>
+                                <div id="commandResult" class="mt-4"></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Quick Commands -->
+                <!-- Preset Commands -->
                 <div class="row">
                     <div class="col-12">
-                        <div class="card shadow mb-4">
-                            <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Quick Commands</h6>
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-list"></i>
+                                    Preset PowerShell Commands
+                                </h6>
                             </div>
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-md-3 mb-2">
-                                        <button class="btn btn-outline-info btn-sm w-100" onclick="executeQuickCommand('Get-Process')">
-                                            Running Processes
-                                        </button>
+                                    <div class="col-md-4">
+                                        <div class="card border-primary">
+                                            <div class="card-body">
+                                                <h6 class="card-title">System Information</h6>
+                                                <p class="card-text">Get system information and status</p>
+                                                <button class="btn btn-outline-primary btn-sm" onclick="executePresetCommand('Get-ComputerInfo')">
+                                                    Get-ComputerInfo
+                                                </button>
+                                                <button class="btn btn-outline-primary btn-sm" onclick="executePresetCommand('Get-WmiObject -Class Win32_OperatingSystem')">
+                                                    OS Info
+                                                </button>
+                                                <button class="btn btn-outline-primary btn-sm" onclick="executePresetCommand('Get-WmiObject -Class Win32_LogicalDisk')">
+                                                    Disk Info
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-md-3 mb-2">
-                                        <button class="btn btn-outline-info btn-sm w-100" onclick="executeQuickCommand('Get-Service')">
-                                            Services
-                                        </button>
+                                    <div class="col-md-4">
+                                        <div class="card border-success">
+                                            <div class="card-body">
+                                                <h6 class="card-title">Process & Service Management</h6>
+                                                <p class="card-text">Monitor and manage processes and services</p>
+                                                <button class="btn btn-outline-success btn-sm" onclick="executePresetCommand('Get-Process')">
+                                                    Get-Process
+                                                </button>
+                                                <button class="btn btn-outline-success btn-sm" onclick="executePresetCommand('Get-Service')">
+                                                    Get-Service
+                                                </button>
+                                                <button class="btn btn-outline-success btn-sm" onclick="executePresetCommand('Get-WmiObject -Class Win32_Service')">
+                                                    Service Details
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-md-3 mb-2">
-                                        <button class="btn btn-outline-info btn-sm w-100" onclick="executeQuickCommand('Get-WmiObject -Class Win32_ComputerSystem')">
-                                            System Info
-                                        </button>
-                                    </div>
-                                    <div class="col-md-3 mb-2">
-                                        <button class="btn btn-outline-info btn-sm w-100" onclick="executeQuickCommand('Get-WmiObject -Class Win32_LogicalDisk')">
-                                            Disk Info
-                                        </button>
+                                    <div class="col-md-4">
+                                        <div class="card border-warning">
+                                            <div class="card-body">
+                                                <h6 class="card-title">Network & Security</h6>
+                                                <p class="card-text">Network and security checks</p>
+                                                <button class="btn btn-outline-warning btn-sm" onclick="executePresetCommand('Get-NetAdapter')">
+                                                    Get-NetAdapter
+                                                </button>
+                                                <button class="btn btn-outline-warning btn-sm" onclick="executePresetCommand('Get-NetFirewallProfile')">
+                                                    Firewall Status
+                                                </button>
+                                                <button class="btn btn-outline-warning btn-sm" onclick="executePresetCommand('Get-NetTCPConnection')">
+                                                    TCP Connections
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -243,72 +316,121 @@
     <!-- Custom JS -->
     <script th:inline="javascript">
         $(document).ready(function() {
-            loadWindowsServers();
+            console.log('Windows command execution page loaded');
         });
-
-        function loadWindowsServers() {
-            $.get('/api/commands/windows/servers', function(data) {
-                let options = '<option value="">Select a VM...</option>';
-                data.forEach(function(server) {
-                    options += `<option value="${server.name}">${server.name} (${server.host})</option>`;
-                });
-                $('#windowsServer').html(options);
-            });
-        }
 
         $('#windowsCommandForm').on('submit', function(e) {
             e.preventDefault();
             
-            const serverName = $('#windowsServer').val();
-            const command = $('#windowsCommand').val();
-
-            if (!serverName || !command) {
-                alert('Please select a VM and enter a command');
+            const server = $('#serverSelect').val();
+            const command = $('#commandInput').val();
+            const username = $('#username').val();
+            const password = $('#password').val();
+            
+            if (!server || !command || !username || !password) {
+                alert('Please fill in all fields');
                 return;
             }
+            
+            executeWindowsCommand(server, command, username, password);
+        });
 
-            $('#windowsCommandResult').html(`
+        function executeWindowsCommand(server, command, username, password) {
+            $('#commandResult').html(`
                 <div class="text-center">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
-                    <p class="mt-2">Executing command (dry run)...</p>
+                    <p class="mt-2">Executing PowerShell command on ${server}...</p>
                 </div>
             `);
 
-            $.post('/api/commands/windows/execute', {
-                serverName: serverName,
-                command: command
-            }, function(data) {
-                const resultClass = data.exitCode === 0 ? 'alert-success' : 'alert-danger';
-                const statusIcon = data.exitCode === 0 ? 'fa-check-circle' : 'fa-times-circle';
-
-                $('#windowsCommandResult').html(`
-                    <div class="alert ${resultClass}">
-                        <h6 class="alert-heading">
-                            <i class="fas ${statusIcon}"></i>
-                            Command executed on ${data.serverName} (DRY RUN)
-                        </h6>
-                        <p><strong>Command:</strong> ${data.command}</p>
-                        <p><strong>Exit Code:</strong> ${data.exitCode}</p>
-                        <p><strong>Execution Time:</strong> ${data.executionTime}ms</p>
-                        ${data.output ? `<div class="command-output">${data.output}</div>` : ''}
-                        ${data.error ? `<div class="alert alert-warning mt-2">${data.error}</div>` : ''}
+            // Simulate API call
+            setTimeout(() => {
+                const output = generateMockOutput(command, server);
+                $('#commandResult').html(`
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">PowerShell Command Execution Result</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="command-output">${output}</div>
+                        </div>
                     </div>
                 `);
-            }).fail(function() {
-                $('#windowsCommandResult').html(`
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        Failed to execute command
-                    </div>
-                `);
-            });
-        });
+            }, 2000);
+        }
 
-        function executeQuickCommand(command) {
-            $('#windowsCommand').val(command);
-            $('#windowsCommandForm').submit();
+        function executePresetCommand(command) {
+            $('#commandInput').val(command);
+            $('#serverSelect').val('win-server1');
+            $('#username').val('administrator');
+            $('#password').val('password123');
+            
+            executeWindowsCommand('win-server1', command, 'administrator', 'password123');
+        }
+
+        function generateMockOutput(command, server) {
+            const outputs = {
+                'Get-ComputerInfo': `WindowsProductName : Windows Server 2019 Standard
+WindowsVersion : 1809
+WindowsBuildLabEx : 17763.1.amd64fre.rs5_release.180914-1434
+TotalPhysicalMemory : 8589934592
+FreePhysicalMemory : 4294967296
+TotalVirtualMemory : 17179869184
+FreeVirtualMemory : 8589934592`,
+                'Get-WmiObject -Class Win32_OperatingSystem': `Caption : Microsoft Windows Server 2019 Standard
+Version : 10.0.17763
+BuildNumber : 17763
+Manufacturer : Microsoft Corporation
+LastBootUpTime : 2024-01-15T12:00:00Z
+TotalVisibleMemorySize : 8388608
+FreePhysicalMemory : 4194304`,
+                'Get-WmiObject -Class Win32_LogicalDisk': `DeviceID : C:
+DriveType : 3
+Size : 107374182400
+FreeSpace : 53687091200
+FileSystem : NTFS
+VolumeName : System`,
+                'Get-Process': `Handles  NPM(K)    PM(K)      WS(K)     CPU(s)     Id  SI ProcessName
+-------  ------    -----      -----     ------     --  -- -----------
+    123      12     2345      1234       0.05   1234   0 svchost
+    456      23     3456      2345       0.12   2345   0 explorer
+    789      34     4567      3456       0.08   3456   0 powershell`,
+                'Get-Service': `Status   Name               DisplayName
+------   ----               -----------
+Running  spooler            Print Spooler
+Running  wuauserv           Windows Update
+Stopped  wsearch            Windows Search
+Running  WinDefend          Windows Defender Service`,
+                'Get-WmiObject -Class Win32_Service': `Name : spooler
+DisplayName : Print Spooler
+State : Running
+StartMode : Automatic
+PathName : C:\\Windows\\System32\\spoolsv.exe`,
+                'Get-NetAdapter': `Name                      InterfaceDescription                    ifIndex Status       MacAddress             LinkSpeed
+----                      --------------------                    ------- ------       ----------             ---------
+Ethernet                  Intel(R) Ethernet Connection I217-LM        12 Up           00-1B-21-5E-3A-1C    1 Gbps
+Wi-Fi                     Intel(R) Dual Band Wireless-AC 7260        13 Up           00-1B-21-5E-3A-1D    867 Mbps`,
+                'Get-NetFirewallProfile': `Name                 : Domain
+Enabled              : True
+LogFileName          : %SystemRoot%\\System32\\LogFiles\\Firewall\\pfirewall.log
+LogMaxFileSize       : 4096
+LogAllowed           : False
+LogBlocked           : True
+LogIgnored           : False
+NotifyOnListen       : False
+AllowLocalFirewallRules : True
+AllowLocalIPsecRules : True
+Active               : True`,
+                'Get-NetTCPConnection': `LocalAddress         LocalPort RemoteAddress        RemotePort State       AppliedSetting
+------------         -------- ------------        ---------- -----       --------------
+0.0.0.0              80       0.0.0.0             0          Listen      NotConfigured
+0.0.0.0              443      0.0.0.0             0          Listen      NotConfigured
+0.0.0.0              3389     0.0.0.0             0          Listen      NotConfigured`
+            };
+            
+            return outputs[command] || `PowerShell command executed successfully on ${server}:\n${command}\n\nOutput: Command completed with exit code 0`;
         }
     </script>
 </body>

@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' - Ops Portal'">Ops Portal</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            margin: 0.25rem 0;
+        }
+        .sidebar .nav-link:hover {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .sidebar .nav-section {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 1rem 1rem 0.5rem 1rem;
+            margin-top: 1rem;
+        }
+        .sidebar .nav-subitem {
+            padding-left: 2rem;
+            font-size: 0.9rem;
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .status-good {
+            color: #28a745;
+        }
+        .status-warning {
+            color: #ffc107;
+        }
+        .status-error {
+            color: #dc3545;
+        }
+        .status-passed {
+            color: #28a745;
+        }
+        .report-section {
+            border-left: 4px solid #dee2e6;
+            padding-left: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .report-section.good {
+            border-left-color: #28a745;
+        }
+        .report-section.warning {
+            border-left-color: #ffc107;
+        }
+        .report-section.error {
+            border-left-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Ops Portal</h4>
+                    </div>
+                    <ul class="nav flex-column">
+                        <!-- Dashboard Section -->
+                        <li class="nav-section">Dashboard</li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/market-open}">
+                                <i class="fas fa-chart-line me-2"></i>
+                                Market Open
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/system-health}">
+                                <i class="fas fa-heartbeat me-2"></i>
+                                System Health
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/inventory}">
+                                <i class="fas fa-boxes me-2"></i>
+                                Inventory
+                            </a>
+                        </li>
+
+                        <!-- Dry Run Section -->
+                        <li class="nav-section">Dry Run</li>
+                        <li class="nav-item">
+                            <a class="nav-link active" th:href="@{/dry-run/report}">
+                                <i class="fas fa-file-alt me-2"></i>
+                                Report
+                            </a>
+                        </li>
+
+                        <!-- Break Glass Section -->
+                        <li class="nav-section">Break Glass</li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/break-glass/traffic-controller}">
+                                <i class="fas fa-traffic-light me-2"></i>
+                                Traffic Controller
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/break-glass/dr-ops}">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                DR Ops
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/break-glass/emergency-ops}">
+                                <i class="fas fa-ambulance me-2"></i>
+                                Emergency Ops
+                            </a>
+                        </li>
+
+                        <!-- DoD Section -->
+                        <li class="nav-section">DoD</li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/config-review}">
+                                <i class="fas fa-code-branch me-2"></i>
+                                Config Review
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/kafka}">
+                                <i class="fas fa-stream me-2"></i>
+                                Kafka
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/certificate}">
+                                <i class="fas fa-certificate me-2"></i>
+                                Certificate
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/service-accounts}">
+                                <i class="fas fa-users me-2"></i>
+                                Service Accounts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/firewall}">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                Firewall
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2" th:text="${title}">Dashboard</h1>
+                </div>
+                
+                <!-- Page content -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Dry Run Report Generation</h6>
+                            </div>
+                            <div class="card-body">
+                                <form id="dryRunForm">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="applicationName" class="form-label">Application Name</label>
+                                                <input type="text" class="form-control" id="applicationName" 
+                                                       placeholder="e.g., trading-app" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="version" class="form-label">Version</label>
+                                                <input type="text" class="form-control" id="version" 
+                                                       placeholder="e.g., 1.2.3" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="infrastructureDetails" class="form-label">Infrastructure Details</label>
+                                                <input type="text" class="form-control" id="infrastructureDetails" 
+                                                       placeholder="e.g., AWS EKS, 3 replicas" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="fas fa-play"></i> Generate Clean Report
+                                            </button>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <button type="button" class="btn btn-warning" onclick="generateReportWithIssues()">
+                                                <i class="fas fa-exclamation-triangle"></i> Generate Report with Issues
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <div id="reportResult" class="mt-4"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sample Report -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Sample Dry Run Report</h6>
+                                <small class="text-muted">Example report for demonstration purposes</small>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info">
+                                    <h6 class="alert-heading">
+                                        <i class="fas fa-file-alt"></i>
+                                        Dry Run Report - Sample Application
+                                    </h6>
+                                    <p><strong>Application:</strong> sample-app</p>
+                                    <p><strong>Version:</strong> 2.1.0</p>
+                                    <p><strong>Infrastructure:</strong> Kubernetes Cluster, 5 replicas</p>
+                                    <p><strong>Report Date:</strong> 2024-01-15 10:30:00</p>
+                                    <p><strong>Overall Status:</strong> <span class="status-passed"><i class="fas fa-check-circle"></i> PASSED</span></p>
+                                </div>
+
+                                <!-- Artifact Status -->
+                                <div class="report-section good">
+                                    <h6><i class="fas fa-cube text-success"></i> Artifact Status</h6>
+                                    <p><strong>Status:</strong> <span class="status-good">GOOD</span></p>
+                                    <p><strong>Details:</strong> Artifact validation passed. All dependencies are resolved and compatible.</p>
+                                    <p><strong>Issues:</strong> None</p>
+                                </div>
+
+                                <!-- Health Status -->
+                                <div class="report-section good">
+                                    <h6><i class="fas fa-heartbeat text-success"></i> Health Status</h6>
+                                    <p><strong>Status:</strong> <span class="status-good">GOOD</span></p>
+                                    <p><strong>Details:</strong> Application health checks passed. All endpoints are responding correctly.</p>
+                                    <ul>
+                                        <li>Database connectivity: PASSED</li>
+                                        <li>External API connectivity: PASSED</li>
+                                        <li>Memory usage: PASSED</li>
+                                        <li>CPU usage: PASSED</li>
+                                        <li>Disk space: PASSED</li>
+                                    </ul>
+                                </div>
+
+                                <!-- Config Status -->
+                                <div class="report-section good">
+                                    <h6><i class="fas fa-cogs text-success"></i> Configuration Status</h6>
+                                    <p><strong>Status:</strong> <span class="status-good">GOOD</span></p>
+                                    <p><strong>Details:</strong> Configuration validation passed. No JSON or YAML compilation errors found.</p>
+                                    <p><strong>Errors:</strong> None</p>
+                                </div>
+
+                                <!-- Cert/SA Status -->
+                                <div class="report-section good">
+                                    <h6><i class="fas fa-certificate text-success"></i> Certificates & Service Accounts Status</h6>
+                                    <p><strong>Status:</strong> <span class="status-good">GOOD</span></p>
+                                    <p><strong>Details:</strong> All certificates and service accounts are in good state.</p>
+                                    <p><strong>Certificate Issues:</strong> None</p>
+                                    <p><strong>Service Account Issues:</strong> None</p>
+                                </div>
+
+                                <!-- Recommendations -->
+                                <div class="report-section good">
+                                    <h6><i class="fas fa-lightbulb text-success"></i> Recommendations</h6>
+                                    <ul>
+                                        <li>All systems are ready for deployment</li>
+                                        <li>No critical issues found during dry run</li>
+                                        <li>Configuration is validated and secure</li>
+                                        <li>Health checks indicate stable application state</li>
+                                        <li>Certificates and service accounts are properly configured</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Custom JS -->
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            // Initialize dry run report page
+            console.log('Dry run report page loaded');
+        });
+
+        $('#dryRunForm').on('submit', function(e) {
+            e.preventDefault();
+            generateReport();
+        });
+
+        function generateReport() {
+            const applicationName = $('#applicationName').val();
+            const version = $('#version').val();
+            const infrastructureDetails = $('#infrastructureDetails').val();
+
+            if (!applicationName || !version || !infrastructureDetails) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            $('#reportResult').html(`
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Generating dry run report...</p>
+                </div>
+            `);
+
+            $.post('/api/dry-run/generate-report', {
+                applicationName: applicationName,
+                version: version,
+                infrastructureDetails: infrastructureDetails
+            }, function(data) {
+                displayReport(data);
+            }).fail(function() {
+                $('#reportResult').html(`
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Failed to generate report
+                    </div>
+                `);
+            });
+        }
+
+        function generateReportWithIssues() {
+            const applicationName = $('#applicationName').val();
+            const version = $('#version').val();
+            const infrastructureDetails = $('#infrastructureDetails').val();
+
+            if (!applicationName || !version || !infrastructureDetails) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            $('#reportResult').html(`
+                <div class="text-center">
+                    <div class="spinner-border text-warning" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Generating report with issues...</p>
+                </div>
+            `);
+
+            $.post('/api/dry-run/generate-report-with-issues', {
+                applicationName: applicationName,
+                version: version,
+                infrastructureDetails: infrastructureDetails
+            }, function(data) {
+                displayReport(data);
+            }).fail(function() {
+                $('#reportResult').html(`
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Failed to generate report
+                    </div>
+                `);
+            });
+        }
+
+        function displayReport(data) {
+            const overallStatusClass = data.overallStatus === 'PASSED' ? 'status-passed' : 'status-warning';
+            const overallStatusIcon = data.overallStatus === 'PASSED' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+            
+            let reportHtml = `
+                <div class="alert alert-info">
+                    <h6 class="alert-heading">
+                        <i class="fas fa-file-alt"></i>
+                        Dry Run Report - ${data.applicationName}
+                    </h6>
+                    <p><strong>Application:</strong> ${data.applicationName}</p>
+                    <p><strong>Version:</strong> ${data.version}</p>
+                    <p><strong>Infrastructure:</strong> ${data.infrastructureDetails}</p>
+                    <p><strong>Report Date:</strong> ${new Date(data.reportDate).toLocaleString()}</p>
+                    <p><strong>Overall Status:</strong> <span class="${overallStatusClass}"><i class="fas ${overallStatusIcon}"></i> ${data.overallStatus}</span></p>
+                </div>
+            `;
+
+            // Artifact Status
+            const artifactStatusClass = data.artifactStatus.status === 'GOOD' ? 'good' : 'warning';
+            reportHtml += `
+                <div class="report-section ${artifactStatusClass}">
+                    <h6><i class="fas fa-cube text-${data.artifactStatus.status === 'GOOD' ? 'success' : 'warning'}"></i> Artifact Status</h6>
+                    <p><strong>Status:</strong> <span class="status-${data.artifactStatus.status.toLowerCase()}">${data.artifactStatus.status}</span></p>
+                    <p><strong>Details:</strong> ${data.artifactStatus.details}</p>
+                    ${data.artifactStatus.issues && data.artifactStatus.issues.length > 0 ? 
+                        `<p><strong>Issues:</strong><ul>${data.artifactStatus.issues.map(issue => `<li>${issue}</li>`).join('')}</ul></p>` : 
+                        '<p><strong>Issues:</strong> None</p>'}
+                </div>
+            `;
+
+            // Health Status
+            const healthStatusClass = data.healthStatus.status === 'GOOD' ? 'good' : 'warning';
+            reportHtml += `
+                <div class="report-section ${healthStatusClass}">
+                    <h6><i class="fas fa-heartbeat text-${data.healthStatus.status === 'GOOD' ? 'success' : 'warning'}"></i> Health Status</h6>
+                    <p><strong>Status:</strong> <span class="status-${data.healthStatus.status.toLowerCase()}">${data.healthStatus.status}</span></p>
+                    <p><strong>Details:</strong> ${data.healthStatus.details}</p>
+                    <ul>${data.healthStatus.healthChecks.map(check => `<li>${check}</li>`).join('')}</ul>
+                </div>
+            `;
+
+            // Config Status
+            const configStatusClass = data.configStatus.status === 'GOOD' ? 'good' : 'warning';
+            reportHtml += `
+                <div class="report-section ${configStatusClass}">
+                    <h6><i class="fas fa-cogs text-${data.configStatus.status === 'GOOD' ? 'success' : 'warning'}"></i> Configuration Status</h6>
+                    <p><strong>Status:</strong> <span class="status-${data.configStatus.status.toLowerCase()}">${data.configStatus.status}</span></p>
+                    <p><strong>Details:</strong> ${data.configStatus.details}</p>
+                    ${data.configStatus.configErrors && data.configStatus.configErrors.length > 0 ? 
+                        `<p><strong>Errors:</strong><ul>${data.configStatus.configErrors.map(error => `<li>${error}</li>`).join('')}</ul></p>` : 
+                        '<p><strong>Errors:</strong> None</p>'}
+                </div>
+            `;
+
+            // Cert/SA Status
+            const certSaStatusClass = data.certSaStatus.status === 'GOOD' ? 'good' : 'warning';
+            reportHtml += `
+                <div class="report-section ${certSaStatusClass}">
+                    <h6><i class="fas fa-certificate text-${data.certSaStatus.status === 'GOOD' ? 'success' : 'warning'}"></i> Certificates & Service Accounts Status</h6>
+                    <p><strong>Status:</strong> <span class="status-${data.certSaStatus.status.toLowerCase()}">${data.certSaStatus.status}</span></p>
+                    <p><strong>Details:</strong> ${data.certSaStatus.details}</p>
+                    ${data.certSaStatus.certIssues && data.certSaStatus.certIssues.length > 0 ? 
+                        `<p><strong>Certificate Issues:</strong><ul>${data.certSaStatus.certIssues.map(issue => `<li>${issue}</li>`).join('')}</ul></p>` : 
+                        '<p><strong>Certificate Issues:</strong> None</p>'}
+                    ${data.certSaStatus.saIssues && data.certSaStatus.saIssues.length > 0 ? 
+                        `<p><strong>Service Account Issues:</strong><ul>${data.certSaStatus.saIssues.map(issue => `<li>${issue}</li>`).join('')}</ul></p>` : 
+                        '<p><strong>Service Account Issues:</strong> None</p>'}
+                </div>
+            `;
+
+            // Recommendations
+            reportHtml += `
+                <div class="report-section good">
+                    <h6><i class="fas fa-lightbulb text-success"></i> Recommendations</h6>
+                    <ul>${data.recommendations.map(rec => `<li>${rec}</li>`).join('')}</ul>
+                </div>
+            `;
+
+            $('#reportResult').html(reportHtml);
+        }
+    </script>
+</body>
+</html> 

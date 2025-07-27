@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' - Ops Portal'">Ops Portal</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            margin: 0.25rem 0;
+        }
+        .sidebar .nav-link:hover {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .sidebar .nav-section {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 1rem 1rem 0.5rem 1rem;
+            margin-top: 1rem;
+        }
+        .sidebar .nav-subitem {
+            padding-left: 2rem;
+            font-size: 0.9rem;
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .emergency-operation {
+            border-left: 4px solid #dc3545;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: #fff;
+            border-radius: 0.375rem;
+            transition: all 0.3s ease;
+        }
+        .emergency-operation:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        .emergency-operation.critical {
+            border-left-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        .emergency-operation.high {
+            border-left-color: #fd7e14;
+            background-color: #fff3cd;
+        }
+        .emergency-operation.medium {
+            border-left-color: #ffc107;
+            background-color: #fff8e1;
+        }
+        .emergency-operation.low {
+            border-left-color: #28a745;
+            background-color: #d4edda;
+        }
+        .operation-status {
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+        .status-success {
+            color: #28a745;
+        }
+        .status-warning {
+            color: #ffc107;
+        }
+        .status-danger {
+            color: #dc3545;
+        }
+        .status-info {
+            color: #17a2b8;
+        }
+        .emergency-alert {
+            background: linear-gradient(45deg, #dc3545, #fd7e14);
+            color: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Ops Portal</h4>
+                    </div>
+                    <ul class="nav flex-column">
+                        <!-- Dashboard Section -->
+                        <li class="nav-section">Dashboard</li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/market-open}">
+                                <i class="fas fa-chart-line me-2"></i>
+                                Market Open
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/system-health}">
+                                <i class="fas fa-heartbeat me-2"></i>
+                                System Health
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/inventory}">
+                                <i class="fas fa-boxes me-2"></i>
+                                Inventory
+                            </a>
+                        </li>
+
+                        <!-- Dry Run Section -->
+                        <li class="nav-section">Dry Run</li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dry-run/report}">
+                                <i class="fas fa-file-alt me-2"></i>
+                                Report
+                            </a>
+                        </li>
+
+                        <!-- Break Glass Section -->
+                        <li class="nav-section">Break Glass</li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/break-glass/traffic-controller}">
+                                <i class="fas fa-traffic-light me-2"></i>
+                                Traffic Controller
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/break-glass/dr-ops}">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                DR Ops
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" th:href="@{/break-glass/emergency-ops}">
+                                <i class="fas fa-ambulance me-2"></i>
+                                Emergency Ops
+                            </a>
+                        </li>
+
+                        <!-- DoD Section -->
+                        <li class="nav-section">DoD</li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/config-review}">
+                                <i class="fas fa-code-branch me-2"></i>
+                                Config Review
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/kafka}">
+                                <i class="fas fa-stream me-2"></i>
+                                Kafka
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/certificate}">
+                                <i class="fas fa-certificate me-2"></i>
+                                Certificate
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/service-accounts}">
+                                <i class="fas fa-users me-2"></i>
+                                Service Accounts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/firewall}">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                Firewall
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2" th:text="${title}">Dashboard</h1>
+                </div>
+                
+                <!-- Page content -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="emergency-alert">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Emergency Operations - Immediate Recovery Actions
+                            </h6>
+                            <p>These operations will immediately recover application configuration, data, or health. Use with extreme caution.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Critical Emergency Operations -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-danger text-white">
+                                <h6 class="m-0 font-weight-bold">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Critical Emergency Operations
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="emergency-operation critical">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">
+                                                        <i class="fas fa-bolt"></i>
+                                                        Emergency Service Restart
+                                                    </h6>
+                                                    <p class="mb-2">Force restart all critical services across all clusters</p>
+                                                    <small class="text-muted">Impact: High | Duration: 2-5 minutes</small>
+                                                </div>
+                                                <button class="btn btn-danger btn-sm" onclick="executeEmergencyOperation('service-restart')">
+                                                    Execute
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="emergency-operation critical">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">
+                                                        <i class="fas fa-database"></i>
+                                                        Database Recovery
+                                                    </h6>
+                                                    <p class="mb-2">Restore database from latest backup and restart services</p>
+                                                    <small class="text-muted">Impact: High | Duration: 10-15 minutes</small>
+                                                </div>
+                                                <button class="btn btn-danger btn-sm" onclick="executeEmergencyOperation('database-recovery')">
+                                                    Execute
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- High Priority Operations -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-warning text-dark">
+                                <h6 class="m-0 font-weight-bold">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    High Priority Operations
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="emergency-operation high">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">
+                                                        <i class="fas fa-cogs"></i>
+                                                        Configuration Recovery
+                                                    </h6>
+                                                    <p class="mb-2">Restore application configuration from backup</p>
+                                                    <small class="text-muted">Impact: Medium | Duration: 3-5 minutes</small>
+                                                </div>
+                                                <button class="btn btn-warning btn-sm" onclick="executeEmergencyOperation('config-recovery')">
+                                                    Execute
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="emergency-operation high">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">
+                                                        <i class="fas fa-network-wired"></i>
+                                                        Network Recovery
+                                                    </h6>
+                                                    <p class="mb-2">Reset network configurations and restart connectivity</p>
+                                                    <small class="text-muted">Impact: Medium | Duration: 5-8 minutes</small>
+                                                </div>
+                                                <button class="btn btn-warning btn-sm" onclick="executeEmergencyOperation('network-recovery')">
+                                                    Execute
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="emergency-operation high">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">
+                                                        <i class="fas fa-shield-alt"></i>
+                                                        Security Recovery
+                                                    </h6>
+                                                    <p class="mb-2">Reset security configurations and certificates</p>
+                                                    <small class="text-muted">Impact: Medium | Duration: 3-7 minutes</small>
+                                                </div>
+                                                <button class="btn btn-warning btn-sm" onclick="executeEmergencyOperation('security-recovery')">
+                                                    Execute
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medium Priority Operations -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h6 class="m-0 font-weight-bold">
+                                    <i class="fas fa-info-circle"></i>
+                                    Medium Priority Operations
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="emergency-operation medium">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">
+                                                        <i class="fas fa-memory"></i>
+                                                        Memory Recovery
+                                                    </h6>
+                                                    <p class="mb-2">Clear memory cache and restart services</p>
+                                                    <small class="text-muted">Duration: 2-3 minutes</small>
+                                                </div>
+                                                <button class="btn btn-info btn-sm" onclick="executeEmergencyOperation('memory-recovery')">
+                                                    Execute
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="emergency-operation medium">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">
+                                                        <i class="fas fa-hdd"></i>
+                                                        Storage Recovery
+                                                    </h6>
+                                                    <p class="mb-2">Reset storage configurations and clear temp files</p>
+                                                    <small class="text-muted">Duration: 3-5 minutes</small>
+                                                </div>
+                                                <button class="btn btn-info btn-sm" onclick="executeEmergencyOperation('storage-recovery')">
+                                                    Execute
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="emergency-operation medium">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">
+                                                        <i class="fas fa-sync"></i>
+                                                        Cache Recovery
+                                                    </h6>
+                                                    <p class="mb-2">Clear all application caches and reload data</p>
+                                                    <small class="text-muted">Duration: 2-4 minutes</small>
+                                                </div>
+                                                <button class="btn btn-info btn-sm" onclick="executeEmergencyOperation('cache-recovery')">
+                                                    Execute
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="emergency-operation medium">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">
+                                                        <i class="fas fa-clock"></i>
+                                                        Time Sync Recovery
+                                                    </h6>
+                                                    <p class="mb-2">Synchronize system time across all servers</p>
+                                                    <small class="text-muted">Duration: 1-2 minutes</small>
+                                                </div>
+                                                <button class="btn btn-info btn-sm" onclick="executeEmergencyOperation('time-sync')">
+                                                    Execute
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Low Priority Operations -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="m-0 font-weight-bold">
+                                    <i class="fas fa-check-circle"></i>
+                                    Low Priority Operations
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="emergency-operation low">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">
+                                                        <i class="fas fa-file-alt"></i>
+                                                        Log Cleanup
+                                                    </h6>
+                                                    <p class="mb-2">Clean up old log files and free disk space</p>
+                                                    <small class="text-muted">Duration: 1-3 minutes</small>
+                                                </div>
+                                                <button class="btn btn-success btn-sm" onclick="executeEmergencyOperation('log-cleanup')">
+                                                    Execute
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="emergency-operation low">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">
+                                                        <i class="fas fa-chart-line"></i>
+                                                        Health Check Reset
+                                                    </h6>
+                                                    <p class="mb-2">Reset health check status and clear alerts</p>
+                                                    <small class="text-muted">Duration: 1-2 minutes</small>
+                                                </div>
+                                                <button class="btn btn-success btn-sm" onclick="executeEmergencyOperation('health-reset')">
+                                                    Execute
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="emergency-operation low">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">
+                                                        <i class="fas fa-bell"></i>
+                                                        Alert Reset
+                                                    </h6>
+                                                    <p class="mb-2">Clear all active alerts and notifications</p>
+                                                    <small class="text-muted">Duration: 1 minute</small>
+                                                </div>
+                                                <button class="btn btn-success btn-sm" onclick="executeEmergencyOperation('alert-reset')">
+                                                    Execute
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency Status -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-chart-line"></i>
+                                    Emergency Operations Status
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <div class="h4 text-danger" id="criticalOps">2</div>
+                                            <p class="mb-0">Critical Operations</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <div class="h4 text-warning" id="highOps">3</div>
+                                            <p class="mb-0">High Priority</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <div class="h4 text-info" id="mediumOps">4</div>
+                                            <p class="mb-0">Medium Priority</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <div class="h4 text-success" id="lowOps">3</div>
+                                            <p class="mb-0">Low Priority</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <h6>Recent Emergency Operations</h6>
+                                    <div id="emergencyHistory">
+                                        <div class="alert alert-info">
+                                            <small>No emergency operations executed yet.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Custom JS -->
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            console.log('Emergency Ops page loaded');
+        });
+
+        function executeEmergencyOperation(operation) {
+            const operationNames = {
+                'service-restart': 'Emergency Service Restart',
+                'database-recovery': 'Database Recovery',
+                'config-recovery': 'Configuration Recovery',
+                'network-recovery': 'Network Recovery',
+                'security-recovery': 'Security Recovery',
+                'memory-recovery': 'Memory Recovery',
+                'storage-recovery': 'Storage Recovery',
+                'cache-recovery': 'Cache Recovery',
+                'time-sync': 'Time Sync Recovery',
+                'log-cleanup': 'Log Cleanup',
+                'health-reset': 'Health Check Reset',
+                'alert-reset': 'Alert Reset'
+            };
+
+            const operationName = operationNames[operation];
+            
+            if (confirm(`Are you sure you want to execute "${operationName}"? This is an emergency operation that may impact system availability.`)) {
+                // Disable button and show loading
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Executing...';
+
+                // Simulate operation execution
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                    
+                    // Add to history
+                    addToHistory(operationName, 'SUCCESS');
+                    
+                    alert(`${operationName} completed successfully!`);
+                }, 3000);
+            }
+        }
+
+        function addToHistory(operationName, status) {
+            const statusClass = status === 'SUCCESS' ? 'success' : 'danger';
+            const statusIcon = status === 'SUCCESS' ? 'check-circle' : 'exclamation-triangle';
+            
+            const historyItem = `
+                <div class="alert alert-${statusClass} alert-dismissible fade show">
+                    <i class="fas fa-${statusIcon}"></i>
+                    <strong>${operationName}</strong> - ${status}
+                    <small class="d-block text-muted">Executed at ${new Date().toLocaleString()}</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            $('#emergencyHistory').prepend(historyItem);
+        }
+    </script>
+</body>
+</html> 
