@@ -14,14 +14,14 @@ spring:
 # Health check endpoints configuration
 health:
   endpoints:
-    - name: "RvyBot"
+    - name: "App1"
       url: "https://www.rvybot.com/health"
       timeout: 5000
-    - name: "Database"
-      url: "http://localhost:8080/health/db"
+    - name: "App2"
+      url: "https://www.rvybot.com/health"
       timeout: 3000
-    - name: "Cache"
-      url: "http://localhost:8080/health/cache"
+    - name: "App3"
+      url: "https://www.rvybot.com/health"
       timeout: 3000
 
 # SSH Configuration for Linux servers

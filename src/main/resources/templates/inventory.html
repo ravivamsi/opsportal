@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' - Operations Portal'">Operations Portal</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            margin: 0.25rem 0;
+        }
+        .sidebar .nav-link:hover {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .sidebar .nav-section {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 1rem 1rem 0.5rem 1rem;
+            margin-top: 1rem;
+        }
+        .sidebar .nav-subitem {
+            padding-left: 2rem;
+            font-size: 0.9rem;
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .status-up {
+            color: #28a745;
+        }
+        .status-down {
+            color: #dc3545;
+        }
+        .command-output {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .status-active {
+            color: #28a745;
+        }
+        .status-inactive {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Operations Portal</h4>
+                    </div>
+                    <ul class="nav flex-column">
+                        <!-- Dashboard Section -->
+                        <li class="nav-section">Dashboard</li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/market-open}">
+                                <i class="fas fa-chart-line me-2"></i>
+                                Market Open
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/system-health}">
+                                <i class="fas fa-heartbeat me-2"></i>
+                                System Health
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" th:href="@{/inventory}">
+                                <i class="fas fa-boxes me-2"></i>
+                                Inventory
+                            </a>
+                        </li>
+
+                        <!-- Dry Run Section -->
+                        <li class="nav-section">Dry Run</li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dry-run/report}">
+                                <i class="fas fa-file-alt me-2"></i>
+                                Report
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dry-run/linux}">
+                                <i class="fab fa-linux me-2"></i>
+                                Linux
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dry-run/windows}">
+                                <i class="fab fa-windows me-2"></i>
+                                Windows
+                            </a>
+                        </li>
+
+                        <!-- DoD Section -->
+                        <li class="nav-section">DoD</li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/config-review}">
+                                <i class="fas fa-code-branch me-2"></i>
+                                Config Review
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/kafka}">
+                                <i class="fas fa-stream me-2"></i>
+                                Kafka
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/certificate}">
+                                <i class="fas fa-certificate me-2"></i>
+                                Certificate
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/service-accounts}">
+                                <i class="fas fa-users me-2"></i>
+                                Service Accounts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/firewall}">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                Firewall
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2" th:text="${title}">Dashboard</h1>
+                </div>
+                
+                <!-- Page content -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Inventory Management</h6>
+                            </div>
+                            <div class="card-body">
+                                <!-- Filter Controls -->
+                                <div class="row mb-3">
+                                    <div class="col-md-2">
+                                        <label for="applicationFilter" class="form-label">Application</label>
+                                        <select class="form-select" id="applicationFilter">
+                                            <option value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="poolFilter" class="form-label">Pool</label>
+                                        <select class="form-select" id="poolFilter">
+                                            <option value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="appIdFilter" class="form-label">AppID</label>
+                                        <select class="form-select" id="appIdFilter">
+                                            <option value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="typeFilter" class="form-label">Type</label>
+                                        <select class="form-select" id="typeFilter">
+                                            <option value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="dcFilter" class="form-label">DC</label>
+                                        <select class="form-select" id="dcFilter">
+                                            <option value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="cFilter" class="form-label">C</label>
+                                        <select class="form-select" id="cFilter">
+                                            <option value="">All</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <label for="domainFilter" class="form-label">Domain</label>
+                                        <select class="form-select" id="domainFilter">
+                                            <option value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="statusFilter" class="form-label">Status</label>
+                                        <select class="form-select" id="statusFilter">
+                                            <option value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 d-flex align-items-end">
+                                        <button class="btn btn-primary me-2" onclick="searchInventory()">
+                                            <i class="fas fa-search"></i> Search
+                                        </button>
+                                        <button class="btn btn-secondary" onclick="clearFilters()">
+                                            <i class="fas fa-times"></i> Clear Filters
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Inventory Table -->
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover" id="inventoryTable">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>Server</th>
+                                                <th>Application</th>
+                                                <th>Pool</th>
+                                                <th>AppID</th>
+                                                <th>Type</th>
+                                                <th>DC</th>
+                                                <th>C</th>
+                                                <th>Port</th>
+                                                <th>Pod</th>
+                                                <th>Node</th>
+                                                <th>Domain</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="inventoryTableBody">
+                                            <tr>
+                                                <td colspan="12" class="text-center">
+                                                    <div class="spinner-border text-primary" role="status">
+                                                        <span class="visually-hidden">Loading...</span>
+                                                    </div>
+                                                    <p class="mt-2">Loading inventory data...</p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Summary Stats -->
+                                <div class="row mt-3">
+                                    <div class="col-md-3">
+                                        <div class="card border-left-primary shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="row no-gutters align-items-center">
+                                                    <div class="col mr-2">
+                                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                            Total Servers
+                                                        </div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalServers">0</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-server fa-2x text-gray-300"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card border-left-success shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="row no-gutters align-items-center">
+                                                    <div class="col mr-2">
+                                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                            Active Servers
+                                                        </div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="activeServers">0</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card border-left-danger shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="row no-gutters align-items-center">
+                                                    <div class="col mr-2">
+                                                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                                            Inactive Servers
+                                                        </div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="inactiveServers">0</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card border-left-info shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="row no-gutters align-items-center">
+                                                    <div class="col mr-2">
+                                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                            Applications
+                                                        </div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalApplications">0</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-cube fa-2x text-gray-300"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Custom JS -->
+    <script th:inline="javascript">
+        let inventoryData = [];
+        let filteredData = [];
+
+        $(document).ready(function() {
+            loadInventoryData();
+        });
+
+        function loadInventoryData() {
+            $.get('/api/inventory/data', function(data) {
+                inventoryData = data;
+                filteredData = data;
+                
+                // Populate filter dropdowns
+                populateFilters();
+                
+                // Display data
+                displayInventoryData();
+                
+                // Update summary stats
+                updateSummaryStats();
+            }).fail(function(xhr, status, error) {
+                $('#inventoryTableBody').html(`
+                    <tr>
+                        <td colspan="12" class="text-center text-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Failed to load inventory data: ${error}
+                        </td>
+                    </tr>
+                `);
+            });
+        }
+
+        function populateFilters() {
+            // Status filter - specific values as requested
+            $('#statusFilter').html(`
+                <option value="">All</option>
+                <option value="active">active</option>
+                <option value="inactive">inactive</option>
+            `);
+
+            // Domain filter - specific values as requested
+            $('#domainFilter').html(`
+                <option value="">All</option>
+                <option value="US">US</option>
+            `);
+
+            // DC filter - specific values as requested
+            $('#dcFilter').html(`
+                <option value="">All</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+            `);
+
+            // C filter - specific values as requested
+            $('#cFilter').html(`
+                <option value="">All</option>
+                <option value="a">a</option>
+                <option value="b">b</option>
+            `);
+
+            // AppID filter - specific values as requested
+            $('#appIdFilter').html(`
+                <option value="">All</option>
+                <option value="6666">6666</option>
+                <option value="6667">6667</option>
+            `);
+
+            // Other filters - populate from actual data
+            const filters = {
+                'applicationFilter': 'application',
+                'poolFilter': 'pool',
+                'typeFilter': 'type'
+            };
+
+            Object.keys(filters).forEach(filterId => {
+                const columnName = filters[filterId];
+                const uniqueValues = [...new Set(inventoryData.map(item => item[columnName]))];
+                
+                let options = '<option value="">All</option>';
+                uniqueValues.forEach(value => {
+                    options += `<option value="${value}">${value}</option>`;
+                });
+                
+                $(`#${filterId}`).html(options);
+            });
+        }
+
+        function displayInventoryData() {
+            let tableHtml = '';
+            
+            if (filteredData.length === 0) {
+                tableHtml = `
+                    <tr>
+                        <td colspan="12" class="text-center text-muted">
+                            No data found matching the selected filters
+                        </td>
+                    </tr>
+                `;
+            } else {
+                filteredData.forEach(item => {
+                    const statusClass = item.status === 'active' ? 'status-active' : 'status-inactive';
+                    const statusIcon = item.status === 'active' ? 'fa-check-circle' : 'fa-times-circle';
+                    
+                    tableHtml += `
+                        <tr>
+                            <td>${item.server}</td>
+                            <td>${item.application}</td>
+                            <td>${item.pool}</td>
+                            <td>${item.appid}</td>
+                            <td>${item.type}</td>
+                            <td>${item.dc}</td>
+                            <td>${item.c}</td>
+                            <td>${item.port}</td>
+                            <td>${item.pod}</td>
+                            <td>${item.node}</td>
+                            <td>${item.domain}</td>
+                            <td>
+                                <i class="fas ${statusIcon} ${statusClass}"></i>
+                                ${item.status}
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            $('#inventoryTableBody').html(tableHtml);
+        }
+
+        function updateSummaryStats() {
+            const total = filteredData.length;
+            const active = filteredData.filter(item => item.status === 'active').length;
+            const inactive = filteredData.filter(item => item.status === 'inactive').length;
+            const applications = [...new Set(filteredData.map(item => item.application))].length;
+
+            $('#totalServers').text(total);
+            $('#activeServers').text(active);
+            $('#inactiveServers').text(inactive);
+            $('#totalApplications').text(applications);
+        }
+
+        function searchInventory() {
+            const filters = {
+                'applicationFilter': 'application',
+                'poolFilter': 'pool',
+                'appIdFilter': 'appid',
+                'typeFilter': 'type',
+                'dcFilter': 'dc',
+                'cFilter': 'c',
+                'domainFilter': 'domain',
+                'statusFilter': 'status'
+            };
+
+            filteredData = inventoryData.filter(item => {
+                return Object.keys(filters).every(filterId => {
+                    const filterValue = $(`#${filterId}`).val();
+                    const columnName = filters[filterId];
+                    
+                    if (!filterValue) return true;
+                    return item[columnName] === filterValue;
+                });
+            });
+
+            displayInventoryData();
+            updateSummaryStats();
+        }
+
+        function clearFilters() {
+            Object.keys({
+                'applicationFilter': 'application',
+                'poolFilter': 'pool',
+                'appIdFilter': 'appid',
+                'typeFilter': 'type',
+                'dcFilter': 'dc',
+                'cFilter': 'c',
+                'domainFilter': 'domain',
+                'statusFilter': 'status'
+            }).forEach(filterId => {
+                $(`#${filterId}`).val('');
+            });
+
+            filteredData = inventoryData;
+            displayInventoryData();
+            updateSummaryStats();
+        }
+
+        // Auto-search on filter change
+        $('select[id$="Filter"]').on('change', function() {
+            searchInventory();
+        });
+    </script>
+</body>
+</html> 

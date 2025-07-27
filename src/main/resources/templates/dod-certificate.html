@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' - Operations Portal'">Operations Portal</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            margin: 0.25rem 0;
+        }
+        .sidebar .nav-link:hover {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .sidebar .nav-section {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 1rem 1rem 0.5rem 1rem;
+            margin-top: 1rem;
+        }
+        .sidebar .nav-subitem {
+            padding-left: 2rem;
+            font-size: 0.9rem;
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .status-up {
+            color: #28a745;
+        }
+        .status-down {
+            color: #dc3545;
+        }
+        .command-output {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .expiring-soon {
+            color: #ffc107;
+        }
+        .expired {
+            color: #dc3545;
+        }
+        .valid {
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Operations Portal</h4>
+                    </div>
+                    <ul class="nav flex-column">
+                        <!-- Dashboard Section -->
+                        <li class="nav-section">Dashboard</li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/market-open}">
+                                <i class="fas fa-chart-line me-2"></i>
+                                Market Open
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/system-health}">
+                                <i class="fas fa-heartbeat me-2"></i>
+                                System Health
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/inventory}">
+                                <i class="fas fa-boxes me-2"></i>
+                                Inventory
+                            </a>
+                        </li>
+
+                        <!-- Dry Run Section -->
+                        <li class="nav-section">Dry Run</li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dry-run/report}">
+                                <i class="fas fa-file-alt me-2"></i>
+                                Report
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dry-run/linux}">
+                                <i class="fab fa-linux me-2"></i>
+                                Linux
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dry-run/windows}">
+                                <i class="fab fa-windows me-2"></i>
+                                Windows
+                            </a>
+                        </li>
+
+                        <!-- DoD Section -->
+                        <li class="nav-section">DoD</li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/config-review}">
+                                <i class="fas fa-code-branch me-2"></i>
+                                Config Review
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/kafka}">
+                                <i class="fas fa-stream me-2"></i>
+                                Kafka
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" th:href="@{/dod/certificate}">
+                                <i class="fas fa-certificate me-2"></i>
+                                Certificate
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/service-accounts}">
+                                <i class="fas fa-users me-2"></i>
+                                Service Accounts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/firewall}">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                Firewall
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2" th:text="${title}">Dashboard</h1>
+                </div>
+                
+                <!-- Page content -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Certificate Management</h6>
+                            </div>
+                            <div class="card-body">
+                                <!-- Filter Controls -->
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="appnameFilter" class="form-label">Application</label>
+                                        <select class="form-select" id="appnameFilter">
+                                            <option value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="certnameFilter" class="form-label">Certificate Name</label>
+                                        <select class="form-select" id="certnameFilter">
+                                            <option value="">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 d-flex align-items-end">
+                                        <button class="btn btn-primary me-2" onclick="searchCertificates()">
+                                            <i class="fas fa-search"></i> Search
+                                        </button>
+                                        <button class="btn btn-secondary" onclick="clearFilters()">
+                                            <i class="fas fa-times"></i> Clear Filters
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Certificate Table -->
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover" id="certificateTable">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>Application</th>
+                                                <th>Certificate Name</th>
+                                                <th>Expiry Date</th>
+                                                <th>Last Rotation</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="certificateTableBody">
+                                            <tr>
+                                                <td colspan="5" class="text-center">
+                                                    <div class="spinner-border text-primary" role="status">
+                                                        <span class="visually-hidden">Loading...</span>
+                                                    </div>
+                                                    <p class="mt-2">Loading certificate data...</p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Summary Stats -->
+                                <div class="row mt-3">
+                                    <div class="col-md-3">
+                                        <div class="card border-left-primary shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="row no-gutters align-items-center">
+                                                    <div class="col mr-2">
+                                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                            Total Certificates
+                                                        </div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalCertificates">0</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-certificate fa-2x text-gray-300"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card border-left-success shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="row no-gutters align-items-center">
+                                                    <div class="col mr-2">
+                                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                            Valid Certificates
+                                                        </div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="validCertificates">0</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card border-left-warning shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="row no-gutters align-items-center">
+                                                    <div class="col mr-2">
+                                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                            Expiring Soon
+                                                        </div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="expiringSoonCertificates">0</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card border-left-danger shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="row no-gutters align-items-center">
+                                                    <div class="col mr-2">
+                                                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                                            Expired Certificates
+                                                        </div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="expiredCertificates">0</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Custom JS -->
+    <script th:inline="javascript">
+        let certificateData = [];
+        let filteredData = [];
+
+        $(document).ready(function() {
+            loadCertificateData();
+        });
+
+        function loadCertificateData() {
+            $.get('/api/certificate/data', function(data) {
+                certificateData = data;
+                filteredData = data;
+                
+                // Populate filter dropdowns
+                populateFilters();
+                
+                // Display data
+                displayCertificateData();
+                
+                // Update summary stats
+                updateSummaryStats();
+            }).fail(function(xhr, status, error) {
+                $('#certificateTableBody').html(`
+                    <tr>
+                        <td colspan="5" class="text-center text-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Failed to load certificate data: ${error}
+                        </td>
+                    </tr>
+                `);
+            });
+        }
+
+        function populateFilters() {
+            // Application filter
+            const appNames = [...new Set(certificateData.map(item => item.appname))];
+            let appOptions = '<option value="">All</option>';
+            appNames.forEach(app => {
+                appOptions += `<option value="${app}">${app}</option>`;
+            });
+            $('#appnameFilter').html(appOptions);
+
+            // Certificate name filter
+            const certNames = [...new Set(certificateData.map(item => item.certname))];
+            let certOptions = '<option value="">All</option>';
+            certNames.forEach(cert => {
+                certOptions += `<option value="${cert}">${cert}</option>`;
+            });
+            $('#certnameFilter').html(certOptions);
+        }
+
+        function displayCertificateData() {
+            let tableHtml = '';
+            
+            if (filteredData.length === 0) {
+                tableHtml = `
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">
+                            No data found matching the selected filters
+                        </td>
+                    </tr>
+                `;
+            } else {
+                filteredData.forEach(item => {
+                    const expiryDate = new Date(item.certexpirydate);
+                    const today = new Date();
+                    const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+                    
+                    let statusClass = 'valid';
+                    let statusIcon = 'fa-check-circle';
+                    let statusText = 'Valid';
+                    
+                    if (daysUntilExpiry < 0) {
+                        statusClass = 'expired';
+                        statusIcon = 'fa-times-circle';
+                        statusText = 'Expired';
+                    } else if (daysUntilExpiry <= 30) {
+                        statusClass = 'expiring-soon';
+                        statusIcon = 'fa-exclamation-triangle';
+                        statusText = 'Expiring Soon';
+                    }
+                    
+                    tableHtml += `
+                        <tr>
+                            <td>${item.appname}</td>
+                            <td>${item.certname}</td>
+                            <td>${item.certexpirydate}</td>
+                            <td>${item.lastrotation}</td>
+                            <td>
+                                <i class="fas ${statusIcon} ${statusClass}"></i>
+                                ${statusText}
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            $('#certificateTableBody').html(tableHtml);
+        }
+
+        function updateSummaryStats() {
+            const total = filteredData.length;
+            let valid = 0;
+            let expiringSoon = 0;
+            let expired = 0;
+
+            filteredData.forEach(item => {
+                const expiryDate = new Date(item.certexpirydate);
+                const today = new Date();
+                const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+                
+                if (daysUntilExpiry < 0) {
+                    expired++;
+                } else if (daysUntilExpiry <= 30) {
+                    expiringSoon++;
+                } else {
+                    valid++;
+                }
+            });
+
+            $('#totalCertificates').text(total);
+            $('#validCertificates').text(valid);
+            $('#expiringSoonCertificates').text(expiringSoon);
+            $('#expiredCertificates').text(expired);
+        }
+
+        function searchCertificates() {
+            const appnameFilter = $('#appnameFilter').val();
+            const certnameFilter = $('#certnameFilter').val();
+
+            filteredData = certificateData.filter(item => {
+                const appMatch = !appnameFilter || item.appname === appnameFilter;
+                const certMatch = !certnameFilter || item.certname === certnameFilter;
+                return appMatch && certMatch;
+            });
+
+            displayCertificateData();
+            updateSummaryStats();
+        }
+
+        function clearFilters() {
+            $('#appnameFilter').val('');
+            $('#certnameFilter').val('');
+
+            filteredData = certificateData;
+            displayCertificateData();
+            updateSummaryStats();
+        }
+
+        // Auto-search on filter change
+        $('select[id$="Filter"]').on('change', function() {
+            searchCertificates();
+        });
+    </script>
+</body>
+</html> 

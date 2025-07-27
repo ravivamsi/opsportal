@@ -8,6 +8,8 @@ public class ConfigDiffResult {
     private String fileName;
     private String branch1;
     private String branch2;
+    private String diff;
+    private int diffCount;
     private List<String> differences;
     private LocalDateTime timestamp;
     private String errorMessage;
@@ -19,6 +21,16 @@ public class ConfigDiffResult {
         this.fileName = fileName;
         this.branch1 = branch1;
         this.branch2 = branch2;
+        this.timestamp = LocalDateTime.now();
+    }
+
+    public ConfigDiffResult(String repositoryName, String fileName, String branch1, String branch2, String diff, int diffCount) {
+        this.repositoryName = repositoryName;
+        this.fileName = fileName;
+        this.branch1 = branch1;
+        this.branch2 = branch2;
+        this.diff = diff;
+        this.diffCount = diffCount;
         this.timestamp = LocalDateTime.now();
     }
 
@@ -53,6 +65,22 @@ public class ConfigDiffResult {
 
     public void setBranch2(String branch2) {
         this.branch2 = branch2;
+    }
+
+    public String getDiff() {
+        return diff;
+    }
+
+    public void setDiff(String diff) {
+        this.diff = diff;
+    }
+
+    public int getDiffCount() {
+        return diffCount;
+    }
+
+    public void setDiffCount(int diffCount) {
+        this.diffCount = diffCount;
     }
 
     public List<String> getDifferences() {

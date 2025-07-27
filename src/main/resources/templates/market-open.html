@@ -171,13 +171,13 @@
                             </div>
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="card border-left-success shadow h-100 py-2">
                                             <div class="card-body">
                                                 <div class="row no-gutters align-items-center">
                                                     <div class="col mr-2">
                                                         <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                            Market Status
+                                                            Overall Status
                                                         </div>
                                                         <div class="h5 mb-0 font-weight-bold text-gray-800">OPEN</div>
                                                     </div>
@@ -188,18 +188,35 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="card border-left-info shadow h-100 py-2">
                                             <div class="card-body">
                                                 <div class="row no-gutters align-items-center">
                                                     <div class="col mr-2">
                                                         <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                                            Trading Volume
+                                                            Trade Volume
                                                         </div>
-                                                        <div class="h5 mb-0 font-weight-bold text-gray-800">$2.4M</div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800">2.4M Shares</div>
                                                     </div>
                                                     <div class="col-auto">
-                                                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                                        <i class="fas fa-chart-bar fa-2x text-gray-300"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card border-left-warning shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="row no-gutters align-items-center">
+                                                    <div class="col mr-2">
+                                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                            Trade Orders
+                                                        </div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800">1.8M Orders</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-exchange-alt fa-2x text-gray-300"></i>
                                                     </div>
                                                 </div>
                                             </div>
@@ -211,20 +228,105 @@
                     </div>
                 </div>
 
-                <!-- Market Data -->
+                <!-- Application Dashboards -->
                 <div class="row">
                     <div class="col-12">
                         <div class="card shadow mb-4">
                             <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Real-time Market Data</h6>
+                                <h6 class="m-0 font-weight-bold text-primary">Market Open Dashboards</h6>
                             </div>
                             <div class="card-body">
-                                <div id="marketData">
-                                    <div class="text-center">
-                                        <div class="spinner-border text-primary" role="status">
-                                            <span class="visually-hidden">Loading...</span>
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card border-left-primary shadow h-100">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
+                                                <h5 class="card-title">Trading Application</h5>
+                                                <p class="card-text">Real-time trading dashboard with order flow and execution metrics.</p>
+                                                <a href="#" class="btn btn-primary btn-sm">View Dashboard</a>
+                                            </div>
                                         </div>
-                                        <p class="mt-2">Loading market data...</p>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card border-left-success shadow h-100">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-chart-pie fa-3x text-success mb-3"></i>
+                                                <h5 class="card-title">Risk Management</h5>
+                                                <p class="card-text">Risk monitoring and compliance dashboard with alerts and limits.</p>
+                                                <a href="#" class="btn btn-success btn-sm">View Dashboard</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card border-left-info shadow h-100">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-database fa-3x text-info mb-3"></i>
+                                                <h5 class="card-title">Data Feed</h5>
+                                                <p class="card-text">Market data feed monitoring and latency analysis dashboard.</p>
+                                                <a href="#" class="btn btn-info btn-sm">View Dashboard</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card border-left-warning shadow h-100">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-cogs fa-3x text-warning mb-3"></i>
+                                                <h5 class="card-title">System Operations</h5>
+                                                <p class="card-text">Infrastructure and system performance monitoring dashboard.</p>
+                                                <a href="#" class="btn btn-warning btn-sm">View Dashboard</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency Operations -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-danger">Emergency Operations</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card border-danger">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                                                <h5 class="card-title">Traffic Flow Control</h5>
+                                                <p class="card-text">Manage and redirect trading traffic flow during emergencies.</p>
+                                                <button class="btn btn-danger btn-sm" onclick="openTrafficControl()">
+                                                    <i class="fas fa-cog"></i> Configure Flow
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card border-warning">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-shield-alt fa-3x text-warning mb-3"></i>
+                                                <h5 class="card-title">Emergency Shutdown</h5>
+                                                <p class="card-text">Emergency shutdown procedures and system isolation controls.</p>
+                                                <button class="btn btn-warning btn-sm" onclick="emergencyShutdown()">
+                                                    <i class="fas fa-power-off"></i> Emergency Stop
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card border-info">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-file-alt fa-3x text-info mb-3"></i>
+                                                <h5 class="card-title">Report Generation</h5>
+                                                <p class="card-text">Generate emergency reports and incident documentation.</p>
+                                                <button class="btn btn-info btn-sm" onclick="generateReport()">
+                                                    <i class="fas fa-download"></i> Generate Report
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -242,50 +344,31 @@
     <!-- Custom JS -->
     <script th:inline="javascript">
         $(document).ready(function() {
-            loadMarketData();
+            // Initialize market open page
+            console.log('Market Open page loaded');
         });
 
-        function loadMarketData() {
-            // Simulate market data loading
+        function openTrafficControl() {
+            if (confirm('Are you sure you want to open Traffic Flow Control? This will allow you to redirect trading traffic.')) {
+                alert('Traffic Flow Control panel opened. Please configure flow settings carefully.');
+                // Here you would typically open a modal or navigate to traffic control interface
+            }
+        }
+
+        function emergencyShutdown() {
+            if (confirm('⚠️ WARNING: This will initiate emergency shutdown procedures. Are you absolutely sure?')) {
+                if (confirm('This action cannot be undone. Final confirmation required.')) {
+                    alert('Emergency shutdown initiated. All trading systems are being isolated.');
+                    // Here you would typically call emergency shutdown APIs
+                }
+            }
+        }
+
+        function generateReport() {
+            alert('Generating emergency report... This may take a few moments.');
+            // Here you would typically call report generation APIs
             setTimeout(function() {
-                $('#marketData').html(`
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Symbol</th>
-                                    <th>Price</th>
-                                    <th>Change</th>
-                                    <th>Volume</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>AAPL</td>
-                                    <td>$150.25</td>
-                                    <td class="text-success">+2.5%</td>
-                                    <td>1.2M</td>
-                                    <td><span class="badge bg-success">Active</span></td>
-                                </tr>
-                                <tr>
-                                    <td>GOOGL</td>
-                                    <td>$2,850.75</td>
-                                    <td class="text-danger">-1.2%</td>
-                                    <td>850K</td>
-                                    <td><span class="badge bg-success">Active</span></td>
-                                </tr>
-                                <tr>
-                                    <td>MSFT</td>
-                                    <td>$310.50</td>
-                                    <td class="text-success">+0.8%</td>
-                                    <td>950K</td>
-                                    <td><span class="badge bg-success">Active</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                `);
+                alert('Emergency report generated successfully. Download will begin shortly.');
             }, 2000);
         }
     </script>

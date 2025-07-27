@@ -1,0 +1,46 @@
+{
+    "appName": "app1",
+    "appId": "1",
+    "appUrl": "https://www.rvybot.com/health",
+    "appPort": "8080",
+    "appProtocol": "http",
+    "appStatus": "active",
+    "appType": "web",
+    "appDescription": "This is the first application",
+    "appOwner": "John Doe",
+    "appOwnerEmail": "john.doe@example.com",
+    "appCerts": [
+        {
+            "certName": "cert1",
+            "certExpiryDate": "2026-07-01",
+            "lastRotation": "2025-07-01"
+        },
+        {
+            "certName": "cert2",
+            "certExpiryDate": "2026-07-01",
+            "lastRotation": "2025-07-01"
+        },
+        {
+            "certName": "cert3",
+            "certExpiryDate": "2026-07-01",
+            "lastRotation": "2025-07-01"
+        }
+    ],
+    "appSAs": [
+        {
+            "saName": "sa1",
+            "saExpiryDate": "2026-07-01",
+            "lastRotation": "2025-07-01"
+        },
+        {
+            "saName": "sa2",
+            "saExpiryDate": "2026-07-01",
+            "lastRotation": "2025-07-01"
+        },
+        {
+            "saName": "sa3",
+            "saExpiryDate": "2026-07-01",
+            "lastRotation": "2025-07-01"
+        }
+    ]
+}
