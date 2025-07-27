@@ -65,40 +65,78 @@
                         <h4 class="text-white">Operations Portal</h4>
                     </div>
                     <ul class="nav flex-column">
+                        <!-- Dashboard Section -->
+                        <li class="nav-section">Dashboard</li>
                         <li class="nav-item">
-                            <a class="nav-link active" th:href="@{/}">
-                                <i class="fas fa-tachometer-alt me-2"></i>
-                                Dashboard
+                            <a class="nav-link" th:href="@{/market-open}">
+                                <i class="fas fa-chart-line me-2"></i>
+                                Market Open
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" th:href="@{/health}">
+                            <a class="nav-link" th:href="@{/system-health}">
                                 <i class="fas fa-heartbeat me-2"></i>
-                                Health Checks
+                                System Health
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" th:href="@{/infrastructure}">
-                                <i class="fas fa-server me-2"></i>
-                                Infrastructure Report
+                            <a class="nav-link" th:href="@{/inventory}">
+                                <i class="fas fa-boxes me-2"></i>
+                                Inventory
+                            </a>
+                        </li>
+
+                        <!-- Dry Run Section -->
+                        <li class="nav-section">Dry Run</li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dry-run/report}">
+                                <i class="fas fa-file-alt me-2"></i>
+                                Report
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" th:href="@{/linux-commands}">
+                            <a class="nav-link" th:href="@{/dry-run/linux}">
                                 <i class="fab fa-linux me-2"></i>
-                                Linux Commands
+                                Linux
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" th:href="@{/windows-commands}">
+                            <a class="nav-link" th:href="@{/dry-run/windows}">
                                 <i class="fab fa-windows me-2"></i>
-                                Windows Commands
+                                Windows
+                            </a>
+                        </li>
+
+                        <!-- DoD Section -->
+                        <li class="nav-section">DoD</li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/config-review}">
+                                <i class="fas fa-code-branch me-2"></i>
+                                Config Review
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" th:href="@{/config-diff}">
-                                <i class="fas fa-code-branch me-2"></i>
-                                Config Differences
+                            <a class="nav-link" th:href="@{/dod/kafka}">
+                                <i class="fas fa-stream me-2"></i>
+                                Kafka
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/certificate}">
+                                <i class="fas fa-certificate me-2"></i>
+                                Certificate
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/service-accounts}">
+                                <i class="fas fa-users me-2"></i>
+                                Service Accounts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/dod/firewall}">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                Firewall
                             </a>
                         </li>
                     </ul>

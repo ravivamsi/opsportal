@@ -81,7 +81,7 @@
                         <!-- Dashboard Section -->
                         <li class="nav-section">Dashboard</li>
                         <li class="nav-item">
-                            <a class="nav-link" th:href="@{/market-open}">
+                            <a class="nav-link active" th:href="@{/market-open}">
                                 <i class="fas fa-chart-line me-2"></i>
                                 Market Open
                             </a>
@@ -163,8 +163,73 @@
                 </div>
                 
                 <!-- Page content -->
-                <div th:replace="${content}">
-                    <!-- Content will be inserted here -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Market Open Status</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card border-left-success shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="row no-gutters align-items-center">
+                                                    <div class="col mr-2">
+                                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                            Market Status
+                                                        </div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800">OPEN</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card border-left-info shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="row no-gutters align-items-center">
+                                                    <div class="col mr-2">
+                                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                            Trading Volume
+                                                        </div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800">$2.4M</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Market Data -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Real-time Market Data</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="marketData">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="mt-2">Loading market data...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>
@@ -175,9 +240,54 @@
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Custom JS -->
-    <script th:replace="${scripts}">
-        // Custom scripts will be inserted here
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            loadMarketData();
+        });
+
+        function loadMarketData() {
+            // Simulate market data loading
+            setTimeout(function() {
+                $('#marketData').html(`
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Price</th>
+                                    <th>Change</th>
+                                    <th>Volume</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>AAPL</td>
+                                    <td>$150.25</td>
+                                    <td class="text-success">+2.5%</td>
+                                    <td>1.2M</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td>GOOGL</td>
+                                    <td>$2,850.75</td>
+                                    <td class="text-danger">-1.2%</td>
+                                    <td>850K</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td>MSFT</td>
+                                    <td>$310.50</td>
+                                    <td class="text-success">+0.8%</td>
+                                    <td>950K</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `);
+            }, 2000);
+        }
     </script>
 </body>
-</html> 
 </html> 

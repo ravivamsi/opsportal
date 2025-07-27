@@ -1,0 +1,17 @@
+Server,Application,Pool,AppID,Type,DC,C,Port,Pod,Node,Domain,Status
+server1,app1,pool1,6666,type1,1,a,8080,pod1,domain1,inactive
+server2,app1,pool1,6666,type1,1,a,8080,pod1,domain1,active
+server3,app2,pool2,6666,type1,1,a,8080,pod1,domain1,active
+server4,app2,pool1,6666,type1,1,a,8080,pod1,domain1,inactive
+server5,app3,pool1,6666,type1,1,a,8080,pod1,domain1,active
+server6,app3,pool2,6666,type1,1,a,8080,pod1,domain1,active
+server7,app3,pool1,6666,type1,1,a,8080,pod1,domain1,inactive
+server8,app3,pool2,6666,type1,1,a,8080,pod1,domain1,inactive
+server9,app1,pool1,6666,type1,1,a,8080,pod1,domain1,inactive
+server10,app1,pool1,6666,type1,1,a,8080,pod1,domain1,active
+server11,app2,pool2,6666,type1,1,a,8080,pod1,domain1,active
+server12,app2,pool1,6666,type1,1,a,8080,pod1,domain1,inactive
+server13,app3,pool1,6666,type1,1,a,8080,pod1,domain1,active
+server14,app3,pool2,6666,type1,1,a,8080,pod1,domain1,active
+server15,app3,pool1,6666,type1,1,a,8080,pod1,domain1,inactive
+server16,app3,pool2,6666,type1,1,a,8080,pod1,domain1,inactive

@@ -9,37 +9,76 @@ public class DashboardController {
 
     @GetMapping("/")
     public String dashboard(Model model) {
-        model.addAttribute("title", "Operations Portal Dashboard");
+        model.addAttribute("title", "Dashboard");
         return "dashboard";
     }
 
-    @GetMapping("/health")
-    public String healthPage(Model model) {
-        model.addAttribute("title", "Health Checks");
-        return "health";
+    // Dashboard Section
+    @GetMapping("/market-open")
+    public String marketOpen(Model model) {
+        model.addAttribute("title", "Market Open");
+        return "market-open";
     }
 
-    @GetMapping("/infrastructure")
-    public String infrastructurePage(Model model) {
-        model.addAttribute("title", "Infrastructure Report");
-        return "infrastructure";
+    @GetMapping("/system-health")
+    public String systemHealth(Model model) {
+        model.addAttribute("title", "System Health");
+        return "system-health";
     }
 
-    @GetMapping("/linux-commands")
-    public String linuxCommandsPage(Model model) {
-        model.addAttribute("title", "Linux Command Execution");
-        return "linux-commands";
+    @GetMapping("/inventory")
+    public String inventory(Model model) {
+        model.addAttribute("title", "Inventory");
+        return "inventory";
     }
 
-    @GetMapping("/windows-commands")
-    public String windowsCommandsPage(Model model) {
-        model.addAttribute("title", "Windows Command Execution");
-        return "windows-commands";
+    // Dry Run Section
+    @GetMapping("/dry-run/report")
+    public String dryRunReport(Model model) {
+        model.addAttribute("title", "Dry Run Report");
+        return "dry-run-report";
     }
 
-    @GetMapping("/config-diff")
-    public String configDiffPage(Model model) {
-        model.addAttribute("title", "Configuration File Differences");
-        return "config-diff";
+    @GetMapping("/dry-run/linux")
+    public String dryRunLinux(Model model) {
+        model.addAttribute("title", "Dry Run - Linux");
+        return "dry-run-linux";
+    }
+
+    @GetMapping("/dry-run/windows")
+    public String dryRunWindows(Model model) {
+        model.addAttribute("title", "Dry Run - Windows");
+        return "dry-run-windows";
+    }
+
+    // DoD Section
+    @GetMapping("/dod/config-review")
+    public String dodConfigReview(Model model) {
+        model.addAttribute("title", "DoD - Config Review");
+        return "dod-config-review";
+    }
+
+    @GetMapping("/dod/kafka")
+    public String dodKafka(Model model) {
+        model.addAttribute("title", "DoD - Kafka");
+        return "dod-kafka";
+    }
+
+    @GetMapping("/dod/certificate")
+    public String dodCertificate(Model model) {
+        model.addAttribute("title", "DoD - Certificate");
+        return "dod-certificate";
+    }
+
+    @GetMapping("/dod/service-accounts")
+    public String dodServiceAccounts(Model model) {
+        model.addAttribute("title", "DoD - Service Accounts");
+        return "dod-service-accounts";
+    }
+
+    @GetMapping("/dod/firewall")
+    public String dodFirewall(Model model) {
+        model.addAttribute("title", "DoD - Firewall");
+        return "dod-firewall";
     }
 } 
