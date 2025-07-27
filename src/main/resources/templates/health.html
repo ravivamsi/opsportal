@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' - Operations Portal'">Operations Portal</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            margin: 0.25rem 0;
+        }
+        .sidebar .nav-link:hover {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .status-up {
+            color: #28a745;
+        }
+        .status-down {
+            color: #dc3545;
+        }
+        .command-output {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Operations Portal</h4>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/}">
+                                <i class="fas fa-tachometer-alt me-2"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" th:href="@{/health}">
+                                <i class="fas fa-heartbeat me-2"></i>
+                                Health Checks
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/infrastructure}">
+                                <i class="fas fa-server me-2"></i>
+                                Infrastructure Report
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/linux-commands}">
+                                <i class="fab fa-linux me-2"></i>
+                                Linux Commands
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/windows-commands}">
+                                <i class="fab fa-windows me-2"></i>
+                                Windows Commands
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/config-diff}">
+                                <i class="fas fa-code-branch me-2"></i>
+                                Config Differences
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2" th:text="${title}">Dashboard</h1>
+                </div>
+                
+                <!-- Page content -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">Health Check Dashboard</h6>
+                                <button class="btn btn-sm btn-outline-primary" onclick="performHealthChecks()">
+                                    <i class="fas fa-sync-alt"></i> Refresh All
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div id="healthResults">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="mt-2">Loading health checks...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Health Check -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Custom Health Check</h6>
+                            </div>
+                            <div class="card-body">
+                                <form id="customHealthForm">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="serviceName" class="form-label">Service Name</label>
+                                                <input type="text" class="form-control" id="serviceName" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="healthUrl" class="form-label">Health Check URL</label>
+                                                <input type="url" class="form-control" id="healthUrl" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="mb-3">
+                                                <label for="timeout" class="form-label">Timeout (ms)</label>
+                                                <input type="number" class="form-control" id="timeout" value="5000" min="1000" max="30000">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-play"></i> Check Health
+                                    </button>
+                                </form>
+                                <div id="customHealthResult" class="mt-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Custom JS -->
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            performHealthChecks();
+        });
+
+        function performHealthChecks() {
+            $('#healthResults').html(`
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Performing health checks...</p>
+                </div>
+            `);
+
+            $.get('/api/health/check-all', function(data) {
+                let resultsHtml = '';
+                
+                data.forEach(function(service) {
+                    const statusClass = service.status === 'UP' ? 'status-up' : 'status-down';
+                    const statusIcon = service.status === 'UP' ? 'fa-check-circle' : 'fa-times-circle';
+                    const cardClass = service.status === 'UP' ? 'border-success' : 'border-danger';
+                    
+                    resultsHtml += `
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card ${cardClass} h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="card-title mb-0">${service.serviceName}</h6>
+                                        <i class="fas ${statusIcon} ${statusClass} fa-lg"></i>
+                                    </div>
+                                    <p class="card-text">
+                                        <small class="text-muted">URL: ${service.url}</small><br>
+                                        <small class="text-muted">Response Time: ${service.responseTime}ms</small><br>
+                                        <small class="text-muted">Status: ${service.status}</small>
+                                    </p>
+                                    ${service.errorMessage ? `<div class="alert alert-danger alert-sm">${service.errorMessage}</div>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                $('#healthResults').html(`<div class="row">${resultsHtml}</div>`);
+            }).fail(function() {
+                $('#healthResults').html(`
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Failed to perform health checks
+                    </div>
+                `);
+            });
+        }
+
+        $('#customHealthForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const serviceName = $('#serviceName').val();
+            const url = $('#healthUrl').val();
+            const timeout = $('#timeout').val();
+
+            $('#customHealthResult').html(`
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Checking health...</p>
+                </div>
+            `);
+
+            $.post('/api/health/check-custom', {
+                serviceName: serviceName,
+                url: url,
+                timeout: timeout
+            }, function(data) {
+                const statusClass = data.status === 'UP' ? 'status-up' : 'status-down';
+                const statusIcon = data.status === 'UP' ? 'fa-check-circle' : 'fa-times-circle';
+                const alertClass = data.status === 'UP' ? 'alert-success' : 'alert-danger';
+
+                $('#customHealthResult').html(`
+                    <div class="alert ${alertClass}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="alert-heading">
+                                    <i class="fas ${statusIcon} ${statusClass}"></i>
+                                    ${data.serviceName} - ${data.status}
+                                </h6>
+                                <p class="mb-1">Response Time: ${data.responseTime}ms</p>
+                                <p class="mb-1">URL: ${data.url}</p>
+                                ${data.errorMessage ? `<p class="mb-0">Error: ${data.errorMessage}</p>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `);
+            }).fail(function() {
+                $('#customHealthResult').html(`
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Failed to perform custom health check
+                    </div>
+                `);
+            });
+        });
+    </script>
+</body>
+</html> 
