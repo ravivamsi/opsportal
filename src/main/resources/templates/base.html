@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: html">
+<head th:replace="layout :: head"></head>
+<body>
+    <div th:replace="layout :: body">
+        <!-- Content fragment -->
+        <div th:fragment="content">
+            <!-- Page specific content goes here -->
+        </div>
+
+        <!-- Scripts fragment -->
+        <div th:fragment="scripts">
+            <!-- Page specific scripts go here -->
+        </div>
+    </div>
+</body>
+</html> 

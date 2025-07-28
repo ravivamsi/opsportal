@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="html">
+<head th:fragment="head">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${title} + ' - Ops Portal'">Ops Portal</title>
@@ -68,7 +68,7 @@
         }
     </style>
 </head>
-<body>
+<body th:fragment="body">
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
@@ -196,9 +196,27 @@
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Custom JS -->
-    <script th:replace="${scripts}">
-        // Custom scripts will be inserted here
+    <div th:replace="${scripts}">
+        <!-- Scripts will be inserted here -->
+    </div>
+    
+    <!-- Navigation Active Link Script -->
+    <script>
+        $(document).ready(function() {
+            // Get current path
+            var currentPath = window.location.pathname;
+            
+            // Remove active class from all nav links
+            $('.sidebar .nav-link').removeClass('active');
+            
+            // Add active class to current page link
+            $('.sidebar .nav-link').each(function() {
+                var href = $(this).attr('href');
+                if (href && currentPath === href) {
+                    $(this).addClass('active');
+                }
+            });
+        });
     </script>
 </body>
-</html> 
 </html> 
