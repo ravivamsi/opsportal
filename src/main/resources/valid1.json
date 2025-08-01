@@ -1,0 +1,49 @@
+[
+    {
+        "component": "app1",
+        "endpoints": [
+            {
+                "endpoint": "http://www.rvybot.com/health"
+            },
+            {
+                "endpoint": "http://www.rvybot.com/health"
+            }
+        ]
+    },
+    {
+        "component": "app2",
+        "endpoints": [
+            {
+                "endpoint": "http://www.rvybot.com/health"
+            },
+            {
+                "endpoint": "http://www.rvybot.com/health"
+            }
+        ]
+    },
+    {
+        "component": "app3",
+        "endpoints": [
+            {
+                "endpoint": "http://www.rvybot.com/health"
+            },
+            {
+                "endpoint": "http://www.rvybot.com/health"
+            }
+        ]
+    },
+    {
+        "component": "app4",
+        "endpoints": [
+            {
+                "endpoint": "http://www.rvybot.com/health"
+            },
+            {
+                "endpoint": "http://www.rvybot.com/health"
+            },
+            {
+                "endpoint": "http://www.rvybot.com/health"
+            }
+        ]
+    }
+]
