@@ -46,8 +46,6 @@ windows:
   servers:
     - name: "win-vm-1"
       host: "192.168.1.200"
-      username: "administrator"
-      domain: "WORKGROUP"
     - name: "win-vm-2"
       host: "192.168.1.201"
       username: "administrator"
@@ -61,5 +59,4 @@ git:
       local-path: "/tmp/config-repo"
       branches:
         - "main"
-        - "develop"
         - "staging" 

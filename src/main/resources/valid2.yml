@@ -22,7 +22,6 @@ health:
       timeout: 3000
     - name: "App3"
       url: "https://www.rvybot.com/health"
-
 # SSH Configuration for Linux servers
 ssh:
   default-timeout: 30000
